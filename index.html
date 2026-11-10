@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>B.C.A // INTERNAL ARCHIVE TERMINAL</title>
+<meta name="description" content="B.C.A 内网档案终端 — 探员 JAE LEE 的机密人事档案与案件归档（同人虚构组织页面）。">
+<meta name="theme-color" content="#05080a">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2016'%3E%3Crect%20width='16'%20height='16'%20fill='%2305080a'/%3E%3Ctext%20x='8'%20y='12'%20font-family='monospace'%20font-size='11'%20fill='%234fe0c0'%20text-anchor='middle'%3EB%3C/text%3E%3C/svg%3E">
+
+<link rel="stylesheet" href="style.css">
+
+
+</head>
+<body>
+
+<div class="topbar">
+  <div><span class="dot"></span>B.C.A / SECURE CHANNEL / ENCRYPTED</div>
+  <div style="display:flex; gap:18px; align-items:center;">
+    <span id="sessionTimer" style="color:var(--amber); display:none;">TEMP // 45:00</span>
+    <span id="clock">--:--:--</span>
+  </div>
+</div>
+
+<!-- 启动 -->
+<div class="stage active" id="s0">
+  <div class="box" style="text-align:center">
+    <h1>B.C.A</h1>
+    <div class="sub">BRIDON CRIME AGENCY · INTERNAL SECURE TERMINAL</div>
+    <div class="rule" style="width:220px;margin:26px auto"></div>
+   <div class="dim" style="font-size:12.5px;letter-spacing:.26em;line-height:2.4">
+  NODE // BRIDON-HQ-07<br>
+  BUILD v4.2.7 · CLASSIFIED<br>
+  <span class="link-conn" id="connBtn" role="button" tabindex="0">[ 建立安全连接 ]</span><span class="cursor"></span>
+</div>
+  </div>
+</div>
+
+
+
+<!-- 1 -->
+<div class="stage" id="s1">
+  <div class="box">
+    <h2>ACCESS REQUEST</h2>
+    <div class="rule"></div>
+    <div class="field"><label>TARGET FILE</label><span>OFFICER / JAE LEE</span></div>
+    <div class="field"><label>FILE NO.</label><span>BCA-FO-SGT-0214</span></div>
+    <div class="field"><label>TERMINAL</label><span>HQ-07 / GUEST</span></div>
+    <div class="rule"></div>
+    <h2 style="margin-top:8px">是否进入探员 JAE LEE 档案？</h2>
+    <div class="btns">
+      <button class="btn" onclick="go(2)">是</button>
+      <button class="btn deny" onclick="denyExit()">否</button>
+    </div>
+  </div>
+</div>
+
+<!-- 2 -->
+<div class="stage" id="s2">
+  <div class="box">
+    <h2 class="warn">⚠ CLASSIFIED LEVEL WARNING</h2>
+    <div class="rule"></div>
+    <div style="font-size:14px;line-height:2.3;color:var(--txt)">
+      该探员职级已达最高级别机密。<br>
+      <span style="color:var(--warn);letter-spacing:.18em">RANK : SERGEANT</span><br>
+      <span class="dim">查看本档案需当前终端向上申请临时授权。<br>所有访问行为将被记录、审计并归档。</span>
+    </div>
+    <div class="field" style="margin-top:18px">
+      <label>AUTH LEVEL REQ.</label><span style="color:var(--amber)">LEVEL 4 / DETECTIVE-CHIEF</span>
+    </div>
+    <div class="btns">
+      <button class="btn" onclick="go(3)">申请权限</button>
+      <button class="btn deny" onclick="denyExit()">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- 3 -->
+<div class="stage" id="s3">
+  <div class="box" style="text-align:center">
+    <h2>活体识别与身份验证</h2>
+    <div class="sub">请正视取景框</div>
+    <div class="frame">
+      <span class="corner c1"></span><span class="corner c2"></span>
+      <span class="corner c3"></span><span class="corner c4"></span>
+      <div class="head"></div>
+      <div class="scanline" id="scanline"></div>
+    </div>
+    <div class="prog"><i id="bar"></i></div>
+    <div class="status" id="scanStatus">BIOMETRIC SCAN · INITIALIZING</div>
+  </div>
+</div>
+
+<!-- 4 -->
+<div class="stage" id="s4">
+  <div class="box">
+    <h2 class="acc">✓ 身份验证通过</h2>
+    <div class="rule"></div>
+    <div class="field"><label>OPERATOR ID</label><span id="uid">————</span></div>
+    <div class="field"><label>ACCESS KEY</label><span id="ukey">————</span></div>
+    <div class="field"><label>SESSION</label><span class="acc">TEMP / 45:00</span></div>
+    <div class="btns">
+      <button class="btn" onclick="doLogin()">登录</button>
+    </div>
+  </div>
+</div>
+
+<!-- 主界面 -->
+<div id="app">
+  <aside class="side">
+    <div class="logo">B.C.A<small>INTERNAL ARCHIVE</small></div>
+    <div class="who">
+      OFFICER<br><b>JAE LEE</b><br>
+      <span style="font-size:11.5px">SGT / 0214</span>
+    </div>
+    <nav class="nav">
+      <div class="nav-item on" data-v="profile"><span class="idx">01</span>基本信息</div>
+      <div class="nav-item" data-v="cases"><span class="idx">02</span>归档案件</div>
+      <div class="nav-item" data-v="train"><span class="idx">03</span>档案记录</div>
+      <div class="nav-item" data-v="med"><span class="idx">04</span>医疗记录</div>
+      <div class="nav-item lock" data-v="pre"><span class="idx">05</span>入组织前经历</div>
+    </nav>
+    <div class="logout" onclick="logout()">终止会话</div>
+  </aside>
+
+  <main class="main">
+
+    <!-- ===== 检索栏 ===== -->
+    <div class="searchwrap">
+      <div class="searchbox">
+        <span class="pfx">&gt;</span>
+        <input id="q" type="text" autocomplete="off" spellcheck="false" aria-label="检索词条"
+               placeholder="检索词条 / SEARCH INDEX">
+        <span class="hint">ENTER</span>
+      </div>
+      <div class="results" id="results"></div>
+    </div>
+
+    <!-- 基本信息 -->
+    <section class="view on" id="view-profile">
+      <div class="vtitle">基 本 信 息 <span>PROFILE / BCA-FO-SGT-0214</span></div>
+      <div class="vsub">LAST UPDATED 2019.11.03 · BY SYSTEM</div>
+      <hr class="sep">
+      <div class="profile-head">
+        <div class="photo">
+  <img class="ph-img" src="assets/id_thumb.jpg" alt="探员 JAE LEE 证件照">
+  <div class="vscan"></div>
+  <div class="tag">BCA-0214 / ID PHOTO</div>
+</div>
+        <div class="grid2">
+          <div>
+            <div class="row"><span class="k">NAME</span><span class="v">李孑</span></div>
+            <div class="row"><span class="k">ROMANIZED</span><span class="v">JAE LEE</span></div>
+            <div class="row"><span class="k">SEX</span><span class="v">MALE</span></div>
+            <div class="row"><span class="k">BIRTHDAY</span><span class="v">1995.2.14</span></div>
+            <div class="row"><span class="k">HEIGHT</span><span class="v">185 CM</span></div>
+            <div class="row"><span class="k">WEIGHT</span><span class="v">80 KG</span></div>
+          </div>
+          <div>
+            <div class="row"><span class="k">BLOOD</span><span class="v">AB</span></div>
+            <div class="row"><span class="k">RANK</span><span class="v g">SERGEANT</span></div>
+            <div class="row"><span class="k">UNIT</span><span class="v">外勤行动组 / 第七特别调查科</span></div>
+            <div class="row"><span class="k">B.P.S. ID</span><span class="v r">已注销</span></div>
+            <div class="row"><span class="k">STATUS</span><span class="v a">待归队 · 个人事假</span></div>
+            <div class="row"><span class="k">IN SERVICE</span><span class="v">2007 — 2019</span></div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="sep">
+      <div class="grid2">
+        <div>
+          <div class="row"><span class="k">ABILITY CLASS</span><span class="v g">S / ACTIVE</span></div>
+          <div class="row"><span class="k">ABILITY</span><span class="v">视线内异能解除</span></div>
+          <div class="row"><span class="k">RANGE</span><span class="v">视线有效范围</span></div>
+        </div>
+        <div>
+          <div class="row"><span class="k">入职时间</span><span class="v">2007.09（12 岁特招）</span></div>
+          <div class="row"><span class="k">累计外勤</span><span class="v">293 次</span></div>
+          <div class="row"><span class="k">结案率</span><span class="v g">96.8%</span></div>
+        </div>
+      </div>
+
+      <div class="sigbox">
+        <div class="lbl"><span>笔迹鉴定存档（书写动力学） / HANDWRITING SAMPLE</span><span>REF · HW-0214-A</span></div>
+        <svg class="sig" viewBox="0 0 420 64" preserveAspectRatio="none">
+          <path d="M14,44 C28,8 38,10 42,30 C46,50 38,52 34,42 C30,32 54,18 70,30
+                   C84,40 76,50 68,44 C60,38 88,16 104,30 C114,38 110,48 102,42
+                   C94,36 120,14 138,28 C148,36 144,46 136,40 C128,34 156,16 174,30
+                   C182,37 178,46 170,40 C162,34 190,12 208,26 C216,33 212,44 204,38
+                   C196,32 226,18 244,32 C252,39 248,46 240,40 C232,34 262,16 280,30"
+                fill="none" stroke="#4fe0c0" stroke-width="1.7" stroke-linecap="round" opacity=".8"/>
+        </svg>
+        <div class="sigmeta">
+          <span>采集日期 2019.03.11</span>
+          <span>比对结果 <span class="acc">一致</span></span>
+          <span>复核状态 正常</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 归档案件 -->
+    <section class="view" id="view-cases">
+      <div class="vtitle">归 档 案 件 <span>CASE ARCHIVE / 6 RECORDS</span></div>
+      <div class="vsub">点击案件条目展开详情</div>
+      <hr class="sep">
+
+      <div class="case open">
+        <div class="case-h" data-c>
+          <span class="no">C-01</span>
+          <span class="nm">萧氏商会灭门案</span>
+          <span class="yr">2009</span>
+          <span class="st void">不予立案</span>
+        </div>
+        <div class="case-b">
+          <dl class="kv">
+            <dt>地点</dt><dd>英都 · 唐人街 · 萧氏宅邸</dd>
+            <dt>探员人数</dt><dd>12</dd>
+            <dt>专案角色</dt><dd>观察员 / 异能筛查（实习）</dd>
+            <dt>案件概述</dt><dd>萧氏家族内部械斗。现场发现 9 名死者，均为家族成员。唯一幸存者萧未影（15 岁）声称系防卫过当。</dd>
+            <dt>处理方式</dt><dd>联合外勤组进行现场异能筛查、证据链整理、人员走访。</dd>
+            <dt>结案结果</dt><dd class="warn">证据不足，不予立案。卷宗封存。</dd>
+            <dt>伤亡</dt><dd>无</dd>
+            <dt>备注</dt><dd class="dim">本探员首个外勤案件，时年 14 岁，其提交的质疑报告未获采纳，未入正卷。</dd>
+          </dl>
+        </div>
+      </div>
+
+      <div class="case">
+        <div class="case-h" data-c>
+          <span class="no">C-02</span>
+          <span class="nm">泰晤士南岸异能制品走私链</span>
+          <span class="yr">2011</span>
+          <span class="st closed">已结</span>
+        </div>
+        <div class="case-b">
+          <dl class="kv">
+            <dt>地点</dt><dd>英都 · 南岸港区 / 跨 4 国 17 节点</dd>
+            <dt>探员人数</dt><dd>26</dd>
+            <dt>专案角色</dt><dd>主控探员</dd>
+            <dt>案件概述</dt><dd>跨国异能制品走私网络，货值约 £4.1M。</dd>
+            <dt>处理方式</dt><dd>卧底渗透 4 个月；收网阶段由本探员解除 6 名异能者能力后定点清除。</dd>
+            <dt>结案结果</dt><dd class="acc">逮捕 23 人，主犯引渡，网络瓦解。</dd>
+            <dt>伤亡</dt><dd>无</dd>
+          </dl>
+        </div>
+      </div>
+
+      <div class="case">
+        <div class="case-h" data-c>
+          <span class="no">C-03</span>
+          <span class="nm">代号「灰鲸」· 跨国洗钱与身份伪造</span>
+          <span class="yr">2013</span>
+          <span class="st closed">已结</span>
+        </div>
+        <div class="case-b">
+          <dl class="kv">
+            <dt>地点</dt><dd>英都 / 苏黎世 / 香港</dd>
+            <dt>探员人数</dt><dd>31</dd>
+            <dt>专案角色</dt><dd>专案副组长</dd>
+            <dt>案件概述</dt><dd>利用 B 级异能伪造身份文件，为走私集团提供跨境资金清洗服务。</dd>
+            <dt>处理方式</dt><dd>多国联合行动；本探员负责伪造者识别与能力压制。</dd>
+            <dt>结案结果</dt><dd class="acc">已结。冻结资产 £11.8M。</dd>
+            <dt>伤亡</dt><dd>本探员左前臂、右腰侧刀伤。重伤 1 人，轻伤若干。</dd>
+          </dl>
+        </div>
+      </div>
+
+      <div class="case">
+        <div class="case-h" data-c>
+          <span class="no">C-04</span>
+          <span class="nm">约克郡异能失控事件</span>
+          <span class="yr">2015</span>
+          <span class="st closed">已结</span>
+        </div>
+        <div class="case-b">
+          <dl class="kv">
+            <dt>地点</dt><dd>约克郡 · 居民区</dd>
+            <dt>探员人数</dt><dd>8</dd>
+            <dt>专案角色</dt><dd>现场处置</dd>
+            <dt>案件概述</dt><dd>B 级异能者在居民区能力失控，造成 6 人重伤、3 栋建筑结构损伤。</dd>
+            <dt>处理方式</dt><dd>本探员在近距离使用能力解除，压制后强制收容。</dd>
+            <dt>结案结果</dt><dd class="acc">已结。收容至 B.C.A 长期监护设施。</dd>
+            <dt>伤亡</dt><dd>本探员右侧肋骨骨裂。2 人重伤。轻伤若干。</dd>
+          </dl>
+        </div>
+      </div>
+
+      <div class="case">
+        <div class="case-h" data-c>
+          <span class="no">C-05</span>
+          <span class="nm">代号「深井」· 系列枪击案</span>
+          <span class="yr">2017</span>
+          <span class="st closed">已结</span>
+        </div>
+        <div class="case-b">
+          <dl class="kv">
+            <dt>地点</dt><dd>英都 · 东区</dd>
+            <dt>探员人数</dt><dd>9</dd>
+            <dt>专案角色</dt><dd>主控探员</dd>
+            <dt>案件概述</dt><dd>针对异能持有者的连续枪击案，共 5 起。</dd>
+            <dt>处理方式</dt><dd>诱捕行动。行动中遭遇伏击。</dd>
+            <dt>结案结果</dt><dd class="acc">已结。</dd>
+            <dt>伤亡</dt><dd class="warn">探员 2 人牺牲。本探员右侧肋骨骨裂 2 根、轻度脑震荡、右臂贯通枪伤。</dd>
+          </dl>
+        </div>
+      </div>
+
+      <div class="case">
+        <div class="case-h" data-c>
+          <span class="no">C-06</span>
+          <span class="nm">唐人街商业联合会年度合规审查</span>
+          <span class="yr">2019</span>
+          <span class="st closed">已结</span>
+        </div>
+        <div class="case-b">
+          <dl class="kv">
+            <dt>地点</dt><dd>英都 · 唐人街</dd>
+            <dt>探员人数</dt><dd>9</dd>
+            <dt>专案角色</dt><dd>主控探员</dd>
+            <dt>案件概述</dt><dd>对唐人街商业联合会下属 14 家企业进行年度经营合规与异能相关风险审查。审查周期 3 个月。非刑事案件。</dd>
+            <dt>处理方式</dt><dd>账目核验、场所走访、从业人员异能登记比对。全程依行政程序执行。</dd>
+            <dt>结案结果</dt><dd class="acc">3 家吊销经营许可，11 家限期整改。无逮捕。</dd>
+            <dt>伤亡</dt><dd>无</dd>
+            <dt>备注</dt><dd class="dim">该审查为该区域首次由 B.C.A 主导的联合行政审查。审查结论未被提起复议。卷宗已于 2019.10 归档。</dd>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <!-- 档案记录 -->
+    <section class="view" id="view-train">
+      <div class="vtitle">档 案 记 录 <span>FILES LOG</span></div>
+      <div class="vsub">2007 — 2019 · 部分条目已脱密处理</div>
+      <hr class="sep">
+      <div class="tl">
+        <div class="tl-i">
+          <div class="d">2007.09</div>
+          <div class="t">破格特招入队</div>
+          <div class="n">异能评级 S，列入优先培养序列。录取意见：能力不可替代，压缩常规学制，确认录为B.C.A「雏鹰」专项培养计划对象。时年 12 岁。</div>
+        </div>
+        <div class="tl-i">
+          <div class="d">2007.10 — 2009.06</div>
+          <div class="t">基础训练 / 异能应用 / 战术与近身格斗</div>
+          <div class="n">同期学员 51 人。结训综合评定：第 1。</div>
+        </div>
+        <div class="tl-i">
+          <div class="d">2009.07</div>
+          <div class="t">适应性训练</div>
+          <div class="n">模拟外勤考核通过。成绩：A+</div>
+        </div>
+        <div class="tl-i">
+          <div class="d">2009.09</div>
+          <div class="t">首次外勤 · C-01 萧氏商会灭门案</div>
+          <div class="n">以异能筛查身份参与。未独立执行任务。时年 14 岁。</div>
+        </div>
+        <div class="tl-i off">
+          <div class="d">2009.09</div>
+          <div class="t">停职 · 心理干预</div>
+          <div class="n">带教方反映该探员出现数日频繁呕吐、进食困难、睡眠障碍，已影响出勤。停职修养一月。处置：心理干预，带教方要求药物治疗。详见医疗记录。</div>
+        </div>
+        <div class="tl-i">
+          <div class="d">2013.09</div>
+          <div class="t">晋升 · 正式探员</div>
+          <div class="n">时年 18 岁。为该批次最年轻正式外勤。</div>
+        </div>
+        <div class="tl-i">
+          <div class="d">2016.04</div>
+          <div class="t">晋升 · 高级探员资格认证</div>
+          <div class="n">通过。评定：具备独立主导高强度任务能力。</div>
+        </div>
+        <div class="tl-i">
+          <div class="d">2017.09</div>
+          <div class="t">录入B.P.S系统 · 警衔 · CONSTABLE</div>
+          <div class="n">年龄达标，参与英都警察厅考核并通过，准予录入B.C.A与警察厅联合设立特殊部门。发放B.P.S证明。</div>
+        </div>
+        <div class="tl-i">
+          <div class="d">2018.11</div>
+          <div class="t">警衔晋升 · SERGEANT</div>
+          <div class="n">时年 23 岁。</div>
+        </div>
+        <div class="tl-i off">
+          <div class="d">2019.09</div>
+          <div class="t">申请脱离警察厅调查队 · 第一次</div>
+          <div class="n">结果：驳回。审批意见：<span class="redact">内容已脱密</span></div>
+        </div>
+        <div class="tl-i">
+          <div class="d">2019.10</div>
+          <div class="t">申请脱离警察厅调查队 · 第二次</div>
+          <div class="n">结果：<span class="amber">通过。状态变更为「待归队 · 个人事假」，注销B.P.S证明。编号保留。</span></div>
+        </div>
+        <div class="tl-i off">
+          <div class="d">2019.11</div>
+          <div class="t">档案封存</div>
+          <div class="n">个人档案转入低权限区。编号保留，不列入编制。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 医疗记录 -->
+    <section class="view" id="view-med">
+      <div class="vtitle">医 疗 记 录 <span>MEDICAL RECORD</span></div>
+      <div class="vsub">2007 — 2019 · 共 15 条 · 依据医疗隐私条例，部分字段受限</div>
+      <hr class="sep">
+      <table class="med">
+        <thead>
+          <tr>
+            <th>日期</th><th>类别</th><th>记录</th><th>处置</th><th>带教要求</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2009.09</td><td>睡眠</td>
+            <td>连续 7 日睡眠不足 4 小时，持续应激，影响训练出勤。</td>
+            <td>医务室补液，留观数日；心理干预，短期助眠处方；训练强度下调至 B 级。</td>
+            <td>迅速治愈</td>
+          </tr>
+          <tr>
+            <td>2009.10</td><td>外伤</td>
+            <td>近身格斗训练，左腕韧带扭伤。</td>
+            <td>弹性固定，休养 5 日。</td>
+            <td>迅速治愈（休养压缩至 2 日）</td>
+          </tr>
+          <tr>
+            <td>2009.11</td><td>外伤</td>
+            <td>外勤现场事故，手掌撕裂伤。</td>
+            <td>清创缝合 4 针；破伤风接种。</td>
+            <td>当日返岗</td>
+          </tr>
+          <tr>
+            <td>2010.02</td><td>外伤</td>
+            <td>格斗训练，左肩软组织挫伤。</td>
+            <td>冷敷、加压包扎。</td>
+            <td>正常治疗</td>
+          </tr>
+          <tr>
+            <td>2011.02</td><td>外伤</td>
+            <td>左肩骨裂。</td>
+            <td>悬吊固定，休养 6 周。</td>
+            <td>迅速治愈（关节腔注射，休养压缩至 3 周）</td>
+          </tr>
+          <tr>
+            <td>2011.11</td><td>外伤</td>
+            <td>右膝半月板轻度损伤。</td>
+            <td>关节固定，休养 4 周。</td>
+            <td>迅速治愈（休养压缩至 2 周）</td>
+          </tr>
+          <tr>
+            <td>2012.05</td><td>外伤</td>
+            <td>右侧肋骨挫伤 2 根。</td>
+            <td>镇痛、胸带固定。</td>
+            <td>保守治疗</td>
+          </tr>
+          <tr>
+            <td>2012.12</td><td>外伤</td>
+            <td>左前臂刀伤、右腰侧刀伤。</td>
+            <td>缝合 11 针；输血 200cc。</td>
+            <td>迅速治愈（次日恢复行动）</td>
+          </tr>
+          <tr>
+            <td>2013.02</td><td>体检</td>
+            <td>年度例行体检。</td>
+            <td>无异常。</td>
+            <td>——</td>
+          </tr>
+          <tr>
+            <td>2014.02</td><td>外伤</td>
+            <td>左肩旧伤复发，肩关节活动度受限。</td>
+            <td>理疗 8 周。</td>
+            <td>——</td>
+          </tr>
+          <tr>
+            <td>2015.09</td><td>外伤</td>
+            <td>右侧肋骨骨裂 1 根。</td>
+            <td>保守治疗，休养 6 周。</td>
+            <td>——</td>
+          </tr>
+          <tr>
+            <td>2016.11</td><td>外伤</td>
+            <td>右侧肋骨骨裂 2 根、轻度脑震荡。</td>
+            <td>住院 9 日。</td>
+            <td>——</td>
+          </tr>
+          <tr>
+            <td>2017.05</td><td>外伤</td>
+            <td>右臂贯通枪伤。</td>
+            <td>手术清创，住院 12 日，休养 10 周。</td>
+            <td>——</td>
+          </tr>
+          <tr>
+            <td>2018.09</td><td>外伤</td>
+            <td>左小腿撕裂伤。</td>
+            <td>清创缝合 9 针，休养 3 周。</td>
+            <td>——</td>
+          </tr>
+          <tr>
+            <td>2019.10</td><td>体检</td>
+            <td>年度例行体检。左肩关节陈旧性损伤，活动度受限；其余指标正常。</td>
+            <td>未处理，记录在案。</td>
+            <td>——</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="noted">
+        ※ 「带教要求」栏仅适用于 2013 年 2 月前，即本探员未成年期间。<br>
+        ※ 标注「迅速治愈」者，处方及休养期由带教方要求压缩。<br>
+        ※ 本档案不含心理干预记录。<br>
+        ※ 最近一次完整体检：2019.10（距今 1 个月）
+      </div>
+    </section>
+
+    <!-- 入组织前 -->
+    <section class="view" id="view-pre">
+      <div class="denied">
+        <div class="icon">🚫</div>
+        <h3>ACCESS DENIED</h3>
+        <div class="lockbar"></div>
+        <p>
+          当前账户权限不足<br>
+          所需权限等级：<span class="warn">LEVEL 5 / DIRECTOR</span><br>
+          该档案已由 B.C.A 法务与人事部门联合封存<br>
+          封存编号：SEAL-2007-0214
+        </p>
+        <p style="margin-top:26px;color:var(--dim);font-size:12px">
+          ※ 本探员入组织前经历（含监护人签署文件）不可通过常规途径调阅
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ 词条：雏鹰计划 ============ -->
+    <section class="view" id="view-doc-eagle">
+      <div class="backlink" onclick="backToProfile()">← 返回档案</div>
+      <div class="dochod dochd">
+        <div class="cls">LEVEL 3</div>
+        <h3>雏 鹰 计 划</h3>
+        <div class="dsub">PROJECT EAGLE · 未成年异能者定向培养专项</div>
+        <div class="meta">
+          <span>文件编号 <b>BCA-DIR-2003-0012</b></span>
+          <span>立项日期 <b>2003.04.17</b></span>
+          <span>状态 <b class="hi">存续观察</b></span>
+        </div>
+        <div class="meta">
+          <span>批准人 <b>副局长 M. 霍尔（Margaret Hall）</b></span>
+          <span>承办 <b>特别人才开发部（STD）</b></span>
+          <span>累计拨款 <b>£11,300,000</b></span>
+        </div>
+      </div>
+
+      <div class="docsec">
+        <h4>一 · 项目定义</h4>
+        <p>「雏鹰计划」为 B.C.A 于 2003 年设立的未成年异能者定向培养专项。计划自全国适龄对象中遴选 S 级异能者，自 12 岁起纳入 B.C.A 直属训练序列，压缩常规学制，结训后直接编入外勤行动组。</p>
+        <p>本计划不属于常规招募渠道，与警察厅考核转入体系并行，互不交叉。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>二 · 立项依据</h4>
+        <p>2001 至 2002 年度，B.C.A 外勤序列 S 级异能者缺编 17 人。常规招募渠道（22 岁经警察厅考核转入）平均培养周期 11 年，无法填补缺口。</p>
+        <p>2002.11，人事部门提交《关于缩短 S 级异能者培养周期的可行性报告》。2003.04，经副局长 M. 霍尔批准立项。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>三 · 正式立项文件（摘录）</h4>
+        <pre class="order">B.C.A / DIRECTORATE ORDER
+编号：BCA-DIR-2003-0012
+签发：副局长 M. 霍尔
+日期：2003.04.17
+
+依《B.C.A 特别人才条例》第四章第二条，批准设立
+专项培养计划，代号「EAGLE」。
+
+一、计划对象：经异能评级确认为 S 级的 12—18 岁适龄对象。
+二、培养方式：纳入 B.C.A 直属训练序列，不受公共教育法
+    关于学龄限制之约束。
+三、学制：常规学制压缩至 2—3 年。
+四、结训后直接编入外勤行动组，不经过警察厅考核程序。
+五、首批拨款 £2,400,000，年度审议后另行追加。
+
+                        —— 副局长 M. 霍尔</pre>
+      </div>
+
+      <div class="docsec">
+        <h4>四 · 项目宗旨</h4>
+        <p>以最短周期、最低损耗，维持外勤序列 S 级战力供给。</p>
+        <p class="cap">※ 「最低损耗」为文件原文表述，未作修订。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>五 · 遴选标准</h4>
+        <ul>
+          <li>异能评级为 S 级。</li>
+          <li>年龄 12 至 18 岁。</li>
+          <li>监护人书面同意。</li>
+        </ul>
+        <p class="cap">※ 第三项附注：监护人不予同意者，由法务部门依《特别人才条例》第七条启动强制评估程序。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>六 · 执行情况（截至 2019.11）</h4>
+        <p>全国累计筛查适龄对象 4,712 名，其中 S 级评级 186 人。最终达到列入计划培养标准者 <b class="amber">3 人</b>。</p>
+        <div class="tblwrap">
+          <table class="tbl">
+            <thead><tr><th>编号</th><th>列入时间</th><th>异能</th><th>状态</th></tr></thead>
+            <tbody>
+              <tr class="dead"><td>E-01</td><td>2004.09</td><td>区域性感知干扰</td><td>2011.06 外勤中死亡</td></tr>
+              <tr class="dead"><td>E-02</td><td>2006.03</td><td>短距空间折叠</td><td>2014.11 异能失控事故死亡</td></tr>
+              <tr><td>E-03</td><td>2007.09</td><td>视线内异能解除</td><td class="acc">在册（待归队）</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="cap">※ E-03 为本档案对象。截至 2019 年，计划内唯一存活者。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>七 · 备注</h4>
+        <p>计划自 2015 年起停止新增遴选。</p>
+        <p>2018 年内部审计意见指出：培养对象损耗率显著高于常规渠道，建议终止本计划。该建议未获批准，计划转入存续观察状态。</p>
+      </div>
+
+      <div class="sigline">
+        <span>归档 <b>2019.11.20</b></span>
+        <span>经办 <b>特别人才开发部</b></span>
+        <span>复核 <b>副局长办公室</b></span>
+      </div>
+    </section>
+
+    <!-- ============ 词条：萧氏商会灭门案 ============ -->
+    <section class="view" id="view-doc-case">
+      <div class="backlink" onclick="backToProfile()">← 返回档案</div>
+      <div class="dochd">
+        <div class="cls">LEVEL 4</div>
+        <h3>萧 氏 商 会 灭 门 案</h3>
+        <div class="dsub">CASE FILE · C-01 · 联合调查报告汇编</div>
+        <div class="meta">
+          <span>B.C.A 案卷 <b>BCA-C-2009-0331</b></span>
+          <span>警察厅案卷 <b>BPS-CR-2009-8842</b></span>
+          <span>结论 <b class="amber">不予立案</b></span>
+        </div>
+        <div class="meta">
+          <span>案发时间 <b>2009.09.12 22:40 — 23:20</b></span>
+          <span>地点 <b>英都 · 唐人街 · 萧氏宅邸</b></span>
+          <span>死者 <b>9 人</b></span>
+        </div>
+      </div>
+
+      <div class="docsec">
+        <h4>一 · 案件经过</h4>
+        <p>2009.09.12 22:40，萧氏宅邸内传出连续枪声，附近居民报警。22:53，首批警力抵达现场，宅邸正门自内反锁，破门用时 7 分钟。</p>
+        <p>现场共发现 9 名死者，全部为萧氏直系成员：一楼门厅 2 人（长子、三女），一层走廊 1 人（次女），二层书房外廊 3 人，书房内 3 人。死亡原因构成：枪伤 4 人、锐器伤 3 人、钝器伤 2 人。</p>
+        <p>现场唯一幸存者为萧未影，男，15 岁，萧氏私生子。于二层书房内被发现，手持制式手枪一支（已击发），全身多处擦伤，无致命伤。</p>
+        <p>萧未影供述：当晚被兄长以家族事务为名召至宅内，遭多人围攻，兄长与其发生肢体摩擦，惊惧下于书房内咬破兄长大动脉致其死亡，后夺取枪支自卫。该供述与现场部分痕迹吻合，但与三名死者的创口方向及射击距离存在出入。</p>
+        <p>宅内监控系统于案发前约 40 分钟被人为关闭。无第三方目击者。萧氏三子脖颈咬合痕迹与萧未影齿列吻合，凶器仅检出萧未影指纹，但存在无法排除的擦拭痕迹。三名重伤者在送医途中死亡，未留下有效陈述。</p>
+        <p>2009.11.20，检察院以证据不足退回补充侦查。2009.12.03，决定不予立案，卷宗封存。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>二 · 英都警察厅 报告</h4>
+        <div class="rpt">
+          <div class="rh"><b>英都警察厅 刑事调查部 重案组</b><span>2009.11.08</span></div>
+          <p><span class="lbl">现场判断</span>现场符合多人械斗特征。创口分布、弹道走向及血迹形态均指向至少两名持械者的相互攻击行为。</p>
+          <p><span class="lbl">供述评估</span>嫌疑人所称「自卫」在部分环节无法证伪，亦无法证实。其陈述中关于夺枪过程的描述与枪身指纹位置存在轻微不符。</p>
+          <p><span class="lbl">结论</span>建议以故意伤害致死移送审查。</p>
+          <p><span class="lbl">保留意见</span>监控关闭时间点与嫌疑人到场时间高度吻合，但无直接证据证明系其本人所为。本组对该时间差保留意见。</p>
+        </div>
+      </div>
+
+      <div class="docsec">
+        <h4>三 · B.C.A 异能搜查科 报告</h4>
+        <div class="rpt">
+          <div class="rh"><b>B.C.A 异能搜查科</b><span>2009.10.30</span></div>
+          <p><span class="lbl">检测结论</span>现场异能残留检测结果为百分之零。9 名死者创口均为物理性损伤，无任何异能作用特征。</p>
+          <p><span class="lbl">意见</span>本案不构成异能犯罪，建议移交常规刑事程序处理。本部门不作实质调查。</p>
+          <p><span class="lbl">附注</span>现场搜查未发现除 B.C.A 随行人员以外的异能者。本报告不代表对嫌疑人陈述真实性的判断。</p>
+        </div>
+      </div>
+
+      <div class="docsec">
+        <h4>四 · B.C.A 特别调查科 报告</h4>
+        <div class="rpt">
+          <div class="rh"><b>B.C.A 特别调查科（SID）</b><span>2009.11.12</span></div>
+          <p><span class="lbl">介入意见</span>本案不涉跨国要素，亦不涉异能犯罪，依职权不介入实质调查。仅就涉案人员背景出具说明。</p>
+          <p><span class="lbl">背景说明</span>萧氏商会为唐人街区域主要商业实体之一，业务涵盖地产、航运与餐饮。萧未影（15 岁）为该会实际控制人之私生子，案发前未列入商会管理层，亦未参与经营。</p>
+          <p><span class="lbl">附注（未入正卷）</span>建议对嫌疑人后续活动保持关注。该建议未获回应。</p>
+        </div>
+      </div>
+
+      <div class="docsec">
+        <h4>五 · 联合结论</h4>
+        <p>2009.12.03，三家单位联合出具结论：本案系家族内部纠纷引发之械斗，嫌疑人萧未影主张之防卫情节无法被排除，亦无法被证实。依存疑有利于被告原则，不予立案，卷宗封存。</p>
+        <p class="cap">※ 本探员（档案对象）以异能筛查随行人员身份参与现场，时年 14 岁。其提交之《关于萧氏宅邸现场痕迹的几点疑问》未获采纳，未入正卷，现存于个人档案附件区。</p>
+        <p class="cap" style="color:var(--warn)">※ 附件区权限不足，不可阅。</p>
+      </div>
+
+      <div class="sigline">
+        <span>联合签署 <b>警察厅重案组 / B.C.A 异能搜查科 / B.C.A 特别调查科</b></span>
+        <span>归档 <b>2009.12.03</b></span>
+      </div>
+    </section>
+
+    <!-- ============ 词条：警察厅特别调查科 ============ -->
+    <section class="view" id="view-doc-dept">
+      <div class="backlink" onclick="backToProfile()">← 返回档案</div>
+      <div class="dochd">
+        <div class="cls">LEVEL 2</div>
+        <h3>警 察 厅 特 别 调 查 科</h3>
+        <div class="dsub">BPS SPECIAL INVESTIGATION UNIT · SIU</div>
+        <div class="meta">
+          <span>设立 <b>2000.11</b></span>
+          <span>隶属 <b>英都警察厅 刑事调查部</b></span>
+          <span>编制 <b>22 人（2019）</b></span>
+        </div>
+        <div class="meta">
+          <span>业务对接 <b>B.C.A 外勤行动组</b></span>
+          <span>最低加入年龄 <b>22 岁</b></span>
+          <span>加入方式 <b>仅 B.C.A 输送</b></span>
+        </div>
+      </div>
+
+      <div class="docsec">
+        <h4>一 · 机构性质</h4>
+        <p>英都警察厅特别调查科（BPS Special Investigation Unit，简称 SIU）为英都警察厅刑事调查部下设的常规警务部门。其人员全部来自 B.C.A 输送，是 B.C.A 人员进入常规警务体系的唯一通道。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>二 · 设立背景</h4>
+        <p>1995 至 1999 年间，B.C.A 探员在英都境内执行任务时，因不具备警务身份，多次在证据采信、拘捕程序与起诉移送环节受阻。所取得之证据常在庭审阶段被质疑取证主体资格。</p>
+        <p>1999 年，B.C.A 与英都警察厅签署《联合执法备忘录》。2000.1，依备忘录设立本部门。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>三 · 人员准入</h4>
+        <ul>
+          <li>加入方式：<b>仅由 B.C.A 输送</b>。不接受社会公开招募，不接受警察厅内部调任，不接受其他执法机构转介。</li>
+          <li>最低加入年龄：<b>22 岁</b>。</li>
+          <li>须参加英都警察厅统一考核，考核通过即录入警务系统，取得正式警员身份。</li>
+        </ul>
+      </div>
+
+      <div class="docsec">
+        <h4>四 · 警衔与体系</h4>
+        <p>本科警衔体系与警察厅其他部门完全一致：Constable → Sergeant → Inspector → Chief Inspector。晋升依警察厅通用程序办理，不设特殊通道，不设快速晋升机制。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>五 · 执法权限</h4>
+        <p>本科人员拥有刑事部门刑警同等执法权，可独立立案、侦查、拘捕、移送审查。</p>
+        <p>处理本国案件时，一律以警察身份介入，不再以 B.C.A 特别探员身份出现。所办案件计入警察厅办案系统，不单独立卷。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>六 · 证件</h4>
+        <p>发放 B.P.S（Bridon Police Service）证。依法行使职权时，不再需要 B.C.A 另行开具执法证明。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>七 · 与 B.C.A 内设「特别调查科」的区别</h4>
+        <p>本部门与 B.C.A 内设之「特别调查科」（Special Investigation Division，SID）名称近似，实务中常被混用。</p>
+        <p>二者无隶属关系：前者隶属英都警察厅，为常规警务部门；后者隶属 B.C.A，处理跨国及异能相关重案。设立时沿用「特别调查」字样，系为延续 B.C.A 人员在原体系内的称谓习惯。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>八 · 现状（截至 2019.11）</h4>
+        <p>累计接收 B.C.A 输送人员 17 人。其中在职 15 人，离职 1 人，转「待归队」状态 1 人。</p>
+        <p class="cap">※ 本档案对象于 2017.09 经本通道录入，警衔 CONSTABLE；2018.11 晋升 SERGEANT；2019.10 注销 B.P.S 证。</p>
+      </div>
+
+      <div class="sigline">
+        <span>归档 <b>2019.11.25</b></span>
+        <span>经办 <b>警察厅人事处 / B.C.A 人事部门</b></span>
+      </div>
+    </section>
+
+    <!-- ============ 词条：沙罗会 ============ -->
+    <section class="view" id="view-doc-sharo">
+      <div class="backlink" onclick="backToProfile()">← 返回档案</div>
+      <div class="dochd">
+        <div class="cls">LEVEL 5</div>
+        <h3>沙 罗 会</h3>
+        <div class="dsub">SHARO · 未确认组织 · 监控对象名录</div>
+        <div class="meta">
+          <span>词条编号 <b>BCA-OBS-1972-0004</b></span>
+          <span>组织类型 <b>未确认异能组织</b></span>
+          <span>状态 <b class="hi">衰颓 / 疑似复苏</b></span>
+        </div>
+        <div class="meta">
+          <span>首次记录 <b>1968.05</b></span>
+          <span>监控等级 <b>LEVEL 5 / 持续监控</b></span>
+          <span>情报来源 <b>探员 JAE LEE（BCA-FO-SGT-0214）</b></span>
+        </div>
+      </div>
+
+      <div class="docsec">
+        <h4>一 · 概要</h4>
+        <p>沙罗会（记录名 SHARO，无确认自称号）为一个活动时间跨度逾百年、成员结构、资金来源与最终目的均不明的异能组织。已知成员绝大多数具有犯罪前科，涉及走私、伪造、胁迫及人身伤害。</p>
+        <p>该组织自二十世纪九十年代中期起急剧衰颓，至 2010 年前后已无可确认的在册活动。近期出现局部复苏迹象，但今日之成员与当年是否同一批人，现无证据支持。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>二 · 历史沿革（可考部分）</h4>
+        <ul>
+          <li>1900 — 1940 年代：仅存零散目击记录与地方警署备忘，无法确认为同一组织。</li>
+          <li>1968.05：英都东区查获一批伪造出入境文书，涉案 6 人中有 4 人身上带相同纹身（见第五节），为首次成体系记录。</li>
+          <li>1972.08：B.C.A 依第 4 号观察令将其列入监控对象名录，编号 BCA-OBS-1972-0004。</li>
+          <li>1972 — 1994 年：活动集中于地下金融与文物走私，成员规模估计 40 至 60 人。</li>
+          <li>1996 年：经内部清洗事件后组织解体之传闻。此后十年 B.C.A 无实质情报收入。</li>
+          <li>2010 — 2017 年：判定为「无活动」，监控等级一度下调。</li>
+          <li>2018 年起：重新出现带同纹身之个体，详见第五节。</li>
+        </ul>
+      </div>
+
+      <div class="docsec">
+        <h4>三 · 已知成员与犯罪记录（节选）</h4>
+        <div class="tblwrap">
+          <table class="tbl">
+            <thead><tr><th>编号</th><th>代号</th><th>确认事由</th><th>处置</th></tr></thead>
+            <tbody>
+              <tr><td>S-08</td><td>「钟表匠」</td><td>1981 — 1989 年间为异能制品走私提供伪造报关文件，涉案 31 起。</td><td>1989 年判刑 12 年；1998 年出狱后失联。</td></tr>
+              <tr><td>S-14</td><td>「白盐」</td><td>1991 年胁迫 3 名 C 级异能者为其从事资金结算。</td><td>1993 年死亡，死因存疑。</td></tr>
+              <tr><td>S-21</td><td>「六指」</td><td>1994 年持械抢劫，致 2 人重伤。</td><td>1995 年收容；2011 年病故于监护设施。</td></tr>
+              <tr class="dead"><td>S-33</td><td>未确认</td><td>2018 年英都南岸出现带同纹身之个体，从事异能制品中介。</td><td>在控。身份核验未通过。</td></tr>
+              <tr class="dead"><td>S-34</td><td>未确认</td><td>2019 年与 S-33 同期出现，疑为同一批接收者。</td><td>在控。身份核验未通过。</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="cap">※ 上表仅收录已进入司法或收容程序之成员。无前科成员不列入本表，其数量不明。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>四 · 识别特征 · 纹身</h4>
+        <p>已知成员于左肩胛下方，或左手腕内侧，刺有同一图样：尺寸 3 至 5 厘米，墨色均黑，手法粗劣，疑出同源。图样为闭合环状外框，内嵌纵向眼形与上下对置之双棱形轴，外环下方留一处缺口。</p>
+        <div class="figure">
+          <div class="figimg"><img src="assets/sign.png" alt="沙罗会成员纹身图样复原"></div>
+          <div class="figcap">
+            <b>图版 S-1 · 纹身图样复原</b>
+            取自 S-33 纹身拓印，经矢量复原。外环缺口为该图样固有特征，非损坏。<br>
+            刺入位置与朝向在个体间存在差异，朝向无规则可循，亦不区分等级。<br>
+            <span class="dim">拓印编号 TAT-S33-2019-01　复原 技术科图像组　调阅权限 LEVEL 5</span>
+          </div>
+        </div>
+        <p class="cap">※ 同一图样曾于 1968、1989、2018 三批互无关联的案卷中出现，图案完全一致。异能性质检测结果均为阴性。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>五 · 近年迹象（2018 — 2019）</h4>
+        <p>2018.11，本探员于唐人街商业联合会年度合规审查期间，在一名中介人员左腕发现上述图样。该人员拒不承认与该组织有关，亦无法说明图样来源。当日记录已入 C-06 卷宗附件。</p>
+        <p>2019.04 至 2019.09，同类图样在英都境内至少出现 5 例，集中于南岸港区与唐人街交界地带。5 人均无前科，年龄 19 至 27 岁，其中 4 人为近三年入境的留学生或务工人员。</p>
+        <p>上述人员之间未发现通讯、资金或亲属关联。共同点仅三项：图样、对「沙罗」二字无反应、被问及图样来源时一律回答「别人给的」。</p>
+        <p class="cap" style="color:var(--warn)">※ 2019.10 起，上述 5 人中 2 人失联，1 人被发现死于南岸港区，死因待查。本条目情报可靠性：中。建议复核。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>六 · 评估与监控建议</h4>
+        <p>目的不明，成员结构不明，与 B.C.A 无已知正式接触记录。不排除其为某一更大型组织之外围分支，亦不排除仅为一群借用同一图样的松散个体。</p>
+        <ul>
+          <li>监控等级维持 LEVEL 5，不因「无活动」判定而下调。</li>
+          <li>发现带同图样之个体，一律登记，并依 B 级异能者处置流程进行异能筛查。</li>
+          <li>禁止任何未经批准的接触、渗透或线人发展。违反者按泄密处理。</li>
+        </ul>
+        <p class="cap">※ 本条为摘要。完整卷宗（含 1968 年以前之原始记录）需 LEVEL 5 授权；当前终端仅以 LEVEL 4 临时授权开放节选。</p>
+      </div>
+
+      <div class="sigline">
+        <span>整理 <b>情报分析组</b></span>
+        <span>复核 <b>外勤行动组 / JAE LEE</b></span>
+        <span>更新 <b>2019.11.06</b></span>
+      </div>
+    </section>
+
+    <!-- ============ 词条：向 ============ -->
+    <section class="view" id="view-doc-xiang">
+      <div class="backlink" onclick="backToProfile()">← 返回档案</div>
+      <div class="dochd">
+        <div class="cls">LEVEL 3</div>
+        <h3>向</h3>
+        <div class="dsub">PERSONNEL FILE · 第七特别调查科 · 确认离职</div>
+        <div class="meta">
+          <span>登记名 <b>向（XIANG）</b></span>
+          <span>原属 <b>外勤行动组 / 第七特别调查科</b></span>
+          <span>状态 <b class="hi">确认离职 · 已批捕</b></span>
+        </div>
+        <div class="meta">
+          <span>在职 <b>2001.04 — 2019.07</b></span>
+          <span>原警衔 <b>INSPECTOR</b></span>
+          <span>关联 <b>本档案对象（2007 — 2013 带教）</b></span>
+        </div>
+      </div>
+
+      <div class="docsec">
+        <h4>一 · 人员概况</h4>
+        <p>向，登记名即姓氏单字，罗马字 XIANG，无公开全名。2001.04 经常规考核转入 B.C.A，编入外勤行动组；2004.09 输送至英都警察厅特别调查科，取得 B.P.S 警员身份，警衔至 INSPECTOR。</p>
+        <p>在职期间长期承担未成年探员的带教与监护职责。2005 至 2017 年间，名下带教对象共 9 人，其中 6 人为「雏鹰计划」对象。其业务评价历年为「良好」以上，未受过纪律处分。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>二 · 与档案对象的带教关系</h4>
+        <p>2007.09，本档案对象（时年 12 岁）经破格特招入队，向为其唯一带教人，负责训练安排、出勤考核、医疗处遇审批与日常监护，直至 2013.02 对象成年。</p>
+        <p>本档案「医疗记录」中「带教要求」一栏，2013.02 之前各条目均由向签署。其中「迅速治愈」类压缩处遇共 6 处，包括两次将休养期压缩至三分之一。该处遇方式在当时被评定为「训练强度维持之必要措施」，未引起复核。</p>
+        <p>2013.02 之后，双方转为常规业务往来。据同组人员回忆，向在 2015 年后主动减少与对象的直接接触，原因不明。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>三 · 离职</h4>
+        <p>2019.07.02，向以「个人健康及家庭原因」提交离职申请，同月 12 日获批，即日脱离 B.C.A，注销 B.P.S 证件，编号保留。离职后未列入任何再就业备案。</p>
+        <p class="cap" style="color:var(--warn)">※ 依《探员行为条例》第二十二条，涉密岗位离职应执行 6 个月脱密观察期。本项审批记录缺失，已转内部审计。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>四 · 涉案情况（2019）</h4>
+        <p>2019.08.19 起，英都警方陆续接到 3 名中国籍留学生报案。经查：向自 2019.05 起，以月息 8% 至 15%（年化约 150%）向英都留学生放贷，涉 17 人，本金合计 £86,000。</p>
+        <p>对逾期者，其以在职期间接触过的出入境记录、异能登记信息及家属情况施压，要求以护照、学生证件质押，并曾指示 2 名债务人至其指定地址「说明情况」。报案人陈述中存在恐吓与限制人身自由情节。</p>
+        <p>2019.09.14，英都警方批捕。搜查其住所时查获债务人名单 3 份、护照 2 本、B.C.A 内部格式文书空白件 11 份。</p>
+        <p class="cap">※ 三名报案人的异能评级分别为 C、D、未评级，均非 B.C.A 关注对象。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>五 · 内部处理</h4>
+        <p>2019.09.20，B.C.A 纪律委员会出具意见：涉案行为发生于离职之后，不适用《探员行为条例》，不予追认处分；已注销之 B.P.S 证件于 2019.10 收回；其经手之 9 名带教对象档案转入复核。</p>
+        <p class="cap">※ 复核结果：除本档案对象外，其余 8 人档案未发现异常。本档案对象就本案提交说明一份，内容未公开。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>六 · 备注</h4>
+        <p>2019.09，本探员提交《关于带教方若干问题的说明》，经法务部门审核后部分内容脱密处理：</p>
+        <div class="redactbox">
+          <span class="redact">内容已脱密</span>
+        </div>
+        <p class="cap">※ 该说明现存于个人档案附件区，需 LEVEL 5 授权调阅。<span class="warn">附件区权限不足，不可阅。</span></p>
+      </div>
+
+      <div class="sigline">
+        <span>经办 <b>人事部门 / 纪律委员会</b></span>
+        <span>复核 <b>法务部门</b></span>
+        <span>更新 <b>2019.11.14</b></span>
+      </div>
+    </section>
+
+    <!-- ============ 词条：BAHATI ============ -->
+    <section class="view" id="view-doc-bahati">
+      <div class="backlink" onclick="backToProfile()">← 返回档案</div>
+      <div class="dochd">
+        <div class="cls">LEVEL 5</div>
+        <h3>BAHATI</h3>
+        <div class="dsub">BAHATI ACADEMY · 英都 · 已停办</div>
+        <div class="meta">
+          <span>机构类型 <b>语言学校 / 特殊教育机构</b></span>
+          <span>建校时间 <b>不可考</b></span>
+          <span>状态 <b class="hi">2009 年火灾后停办</b></span>
+        </div>
+        <div class="meta">
+          <span>学制 <b>小学至高中一体化</b></span>
+          <span>与 B.C.A 合作 <b>2001 — 2008，协议作废</b></span>
+          <span>在册人数 <b>217 人（2008 学年）</b></span>
+        </div>
+      </div>
+
+      <div class="docsec">
+        <h4>一 · 名称</h4>
+        <p>BAHATI 取自斯瓦希里语，意为「生命中不可预知的奇迹，与美好的巧合」。校方从未说明取名缘由，亦未在公开材料中解释其与英都的任何语言学关联。</p>
+        <p>建校时间不可考。现存最早的实物证据为一张 1958 年的校舍照片，照片中的主楼与 2009 年火灾烧毁之主楼为同一建筑。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>二 · 表面与实质</h4>
+        <p>该校对外登记为语言学校，开设英语、法语、斯瓦希里语三门课程，学制覆盖小学至高中，全日制寄宿。招生简章所列条件为「语言基础测试」与「家庭面谈」。</p>
+        <p>实质上，该校为专门招收异能学生之特殊学校。全部在册学生的入学测试均包含异能评级项目，课程中包含异能控制、抑制与伪装训练。此项在 2001 年与 B.C.A 签署协议后，由 B.C.A 特别人才开发部（STD）直接提供教材与教官。</p>
+        <p class="cap">※ 该校学生异能评级分布：S 级 0 人、A 级 6 人、B 级 31 人、C 级及以下 180 人（2008 学年统计）。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>三 · 与 B.C.A 的合作（2001 — 2008）</h4>
+        <p>2001.03，B.C.A 特别人才开发部与 BAHATI 校方签署《异能适龄人员联合培养协议》。依协议，校方每年向 B.C.A 通报适龄学生名册；B.C.A 向校方提供异能评级、抑制器具与个案顾问；毕业生中评级 B 级以上者，经本人与监护人同意，可由 B.C.A 直接录用，不经公开招募。</p>
+        <p>合作期间，累计向 B.C.A 输送毕业生 23 人，其中在职 9 人、离职 11 人、死亡 3 人。</p>
+        <p>2008.06，双方管理层共同宣布协议作废，合作终止，未说明理由。作废原因、协商记录及后续处置方案之相关文件，现已全部丢失。</p>
+        <div class="corrupt">
+          <div class="corrupt-h">附件 3 · 《联合培养协议》作废备忘 · 扫描件</div>
+          <div class="corrupt-lines">
+            <i style="width:96%"></i><i style="width:88%"></i><i style="width:93%"></i>
+            <i style="width:74%"></i><i style="width:86%"></i><i style="width:52%"></i>
+          </div>
+          <div class="corrupt-tag">FILE CORRUPTED · 校验失败 · 内容不可恢复</div>
+        </div>
+        <p class="cap" style="color:var(--warn)">※ 该文件在 2011 年档案数字化迁移中损坏，原始纸质件已依流程销毁。现存仅此损坏副本，恢复尝试 3 次均失败。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>四 · 2009 年火灾</h4>
+        <p>2009.11.17 夜间 23:40 前后，主楼 B 座三层起火，火势于 40 分钟内蔓延至整栋。当晚在校 89 人，其中寄宿学生 71 人、值班教职工 18 人。</p>
+        <p>火灾后，校方与英都消防部门联合召开发布会，通报死亡 88 人、生还 1 人，并称起火原因为电气线路老化，不涉人为。该校自火灾后未再复课，场地于 2011 年拆除。</p>
+        <p class="cap">※ 现场异能残留检测结果为阴性。消防报告原文中「起火点附近存在无来源助燃剂残留」一句，在最终公开版本中被删除。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>五 · 幸存者（B.C.A 查证版）</h4>
+        <p>对外通报之唯一幸存者为高三女性学生王青（国籍：中）。B.C.A 于 2010.02 复核出入境与医疗记录后确认，实际幸存者存在 3 人：</p>
+        <div class="tblwrap">
+          <table class="tbl">
+            <thead><tr><th>姓名</th><th>年级</th><th>国籍</th><th>公开报道</th><th>B.C.A 查证</th></tr></thead>
+            <tbody>
+              <tr><td>王青</td><td>高三</td><td>中</td><td>唯一幸存者</td><td class="acc">确认幸存，2010.01 出院</td></tr>
+              <tr><td>夏斐</td><td>五年级</td><td>中</td><td>未提及</td><td>确认幸存，2009.12 由不明人员送返</td></tr>
+              <tr><td>阿元</td><td>四年级</td><td>泰</td><td>未提及</td><td>确认幸存，2009.12 后失去监护记录</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>其余两人未见于任何公开报道、死亡名单或保险理赔记录。为何排除在公开通报之外，原因不明。相关通报的原始底稿未见存档。</p>
+        <p class="cap" style="color:var(--warn)">※ 三名幸存者均确认存在原因不明之记忆缺失。详见各自词条。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>六 · 结论</h4>
+        <p>该校自 2001 年起即为 B.C.A 之合作机构，合作关系终止于 2008 年，终止原因文件灭失。2009 年火灾后，校方主体解散，无继受机构。</p>
+        <p>现存疑点三项：协议作废之真实原因；火灾当晚另两名幸存者之去向；通报口径由何部门确定。上述三项均无卷宗支持。</p>
+        <p class="cap">※ 本条为机构档案摘要，需 LEVEL 5 授权；当前终端以 LEVEL 4 临时授权开放节选。</p>
+      </div>
+
+      <div class="sigline">
+        <span>整理 <b>特别调查科（SID）</b></span>
+        <span>复核 <b>法务部门 / 档案室</b></span>
+        <span>更新 <b>2019.11.18</b></span>
+      </div>
+    </section>
+
+    <!-- ============ 词条：阿元 ============ -->
+    <section class="view" id="view-doc-ayuan">
+      <div class="backlink" onclick="backToProfile()">← 返回档案</div>
+      <div class="dochd">
+        <div class="cls">LEVEL 3</div>
+        <h3>阿 元</h3>
+        <div class="dsub">PERSONNEL FILE · BAHATI 火灾幸存者 · 搜寻中</div>
+        <div class="meta">
+          <span>登记名 <b>阿元（AYUAN）</b></span>
+          <span>国籍 <b>泰</b></span>
+          <span>出生 <b>1999.06.23</b></span>
+        </div>
+        <div class="meta">
+          <span>原就读 <b>BAHATI 四年级</b></span>
+          <span>异能 <b>言语指令支配 / B 级（待复核）</b></span>
+          <span>状态 <b class="hi">失联 · 搜寻中</b></span>
+        </div>
+      </div>
+
+      <div class="docsec">
+        <h4>一 · 概况</h4>
+        <p>阿元，泰籍，登记名来自校方学籍卡，泰国方面无对应出生登记可核。1999.06.23 出生，2005.09 入学 BAHATI，火灾时为四年级在读，年龄 10 岁。</p>
+        <p>其入学资料载明监护人一栏为「校方代管」，无父母信息。学费来源登记为「奖学金」，资助方未填。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>二 · 火灾与失忆</h4>
+        <p>2009.11.17 火灾当晚，其被一名值班教职工带离火场，随后送入英都东区医院，诊断为一氧化碳中毒与轻度烧伤，2009.12.08 出院。</p>
+        <p>出院记录记载：患者对火灾当晚及此前生活「无连续记忆」，无法说出父母姓名、原居住地及在校班级。经三次心理评估，结论均为「原因不明之逆行性记忆缺失，非器质性损伤可解释」。</p>
+        <p>出院当日，一名自称「远房亲属」之男子办理离院手续，文件签字为「阿元」二字，笔迹与其学籍卡不符。此后其监护记录中断。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>三 · 异能</h4>
+        <p>经 2014 年、2017 年两次间接确认，其异能可概括为「言语指令支配」：以日常对话之形式发出指令，目标在听见并理解该语言的前提下，会依指令行动，事后对自身行为无抵触感，部分案例中不保留记忆。</p>
+        <ul>
+          <li>有效半径：约 15 米，超出后已生效指令不中断。</li>
+          <li>生效条件：目标须能听懂所用语言；对本能强烈抵触之指令（如自伤），效果显著减弱或失效。</li>
+          <li>持续时间：单条指令通常为数分钟至数小时；无证据支持长期支配。</li>
+          <li>可否对同一目标重复使用：可以，未见次数上限。</li>
+        </ul>
+        <p class="cap">※ 上述参数均来自二手证词，未见其实施过程。评级暂定 B 级，待复核。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>四 · 失踪经过</h4>
+        <p>2013 至 2018 年，其活动轨迹断续出现于泰北、缅北与老挝北部，多与地方赌场、边贸中介相关。2018.03 起，其在缅挝边境地区以「翻译」身份活动，无固定居所。</p>
+        <p>2019.06，一名线人报告其出现在缅老边境某镇，同行者 3 人，身份不明。2019.09 复查时已离开，此前登记之联系方式全部失效。</p>
+        <p class="cap" style="color:var(--warn)">※ 目前因不明原因身处缅挝地区，具体下落不明。正在搜寻。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>五 · 风险评估与处置</h4>
+        <p>其记忆缺失状态未经正式确认，无法排除其已知晓火灾当晚之实际情况。鉴于其异能可在无接触、无预兆的情况下生效，接触须遵循以下要求：</p>
+        <ul>
+          <li>接触人员不得少于 3 人，其中至少 1 人具备异能解除或压制能力。</li>
+          <li>不得以对话形式进行初次接触；如需交谈，应使用录音延迟回放或文字交流。</li>
+          <li>发现其行踪，先行上报，不得自行接触。</li>
+        </ul>
+        <p class="cap">※ 本条目与本探员无直接关联，仅为关联档案。搜寻任务由 SID 第三组承办。</p>
+      </div>
+
+      <div class="sigline">
+        <span>整理 <b>特别调查科（SID）第三组</b></span>
+        <span>复核 <b>情报分析组</b></span>
+        <span>更新 <b>2019.10.29</b></span>
+      </div>
+    </section>
+
+    <!-- ============ 词条：夏斐 ============ -->
+    <section class="view" id="view-doc-xiafei">
+      <div class="backlink" onclick="backToProfile()">← 返回档案</div>
+      <div class="dochd">
+        <div class="cls">LEVEL 4</div>
+        <h3>夏 斐</h3>
+        <div class="dsub">PERSONNEL FILE · BAHATI 火灾幸存者 · 需监控</div>
+        <div class="meta">
+          <span>姓名 <b>夏斐 / FELIX</b></span>
+          <span>国籍 <b>中</b></span>
+          <span>出生 <b>1998.07.27</b></span>
+        </div>
+        <div class="meta">
+          <span>原就读 <b>BAHATI 五年级</b></span>
+          <span>异能 <b>未确认 / 三次检测阴性</b></span>
+          <span>状态 <b class="hi">英都皇家学院在读 · 需监控</b></span>
+        </div>
+      </div>
+
+      <div class="docsec">
+        <h4>一 · 概况</h4>
+        <p>夏斐，英文名 FELIX，中国籍，1998.07.27 出生。2007.09 入学 BAHATI，火灾时为五年级在读，年龄 11 岁。学籍卡载明监护人一栏为「外祖父母，中国境内」，联系方式在 2011 年后失效。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>二 · 火灾与送返</h4>
+        <p>2009.11.17 火灾中，其被发现于主楼 B 座二层楼梯间，无明显外伤，因吸入烟气送入英都东区医院观察 11 日。期间未接受正式问询。</p>
+        <p>2009.12.04，其由两名不明人员陪同，经英都至上海航班离境，出境文件齐全，签字人为「夏斐」二字，笔迹与学籍卡基本一致。送返一方身份、其与校方或监护人的关系，均无记录。</p>
+        <p>其记忆缺失由 2011 年国内医疗记录间接确认：患者无法回忆 2009 年冬季及之前之生活细节，对 BAHATI、校舍、同学均无印象。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>三 · 异能核查</h4>
+        <p>2016 年入境后共进行 3 次异能检测（2016.11、2018.04、2019.05），结论一致：<b>未测及可辨识之异能反应</b>。三次检测均在非应激状态下进行。</p>
+        <p>本人自述「没有异能」，对检测结果无异议。BAHATI 学籍卡异能栏记载为「待测」，与其在校两年的训练记录（未见异能控制课程出勤）不一致。</p>
+        <p class="cap" style="color:var(--warn)">※ 无论其异能是否存在，其 BAHATI 学籍身份与火灾幸存者身份均已确认。监控依据为身份，非异能。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>四 · 现况</h4>
+        <p>2016.09 本人以留学签注入境英都，入学申请由其本人提出。2017.09 入读英都皇家学院，现三年级在读，专业为视觉传达，成绩中上，无违纪记录。</p>
+        <p>2018.05 起，其在萧未影名下模特公司（登记名：未影文化）兼职，岗位为平面模特，月均出勤 4 至 6 次，报酬按次结算，合同为常规格式。</p>
+        <p>其社交范围有限，主要为同学与同公司模特，未发现与异能相关组织或人员之往来。境外通讯记录中，泰国、缅甸方向号码各出现 1 次，均为骚扰电话。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>五 · 与萧未影的关联</h4>
+        <p>萧未影为 2009 年 C-01 案唯一幸存者，现为唐人街商业联合会下属企业实际控制人之一，名下另有模特公司、餐饮与地产。其与夏斐之关系仅限于雇主与兼职人员。</p>
+        <p>核查结论：夏斐系通过公开招募渠道应征入职，面试记录、合同、酬劳流水均完整；入职时间与其来英都之时间相隔 20 个月，无时间上的可疑衔接；二人无私人往来记录，无私下会面，无资金往来。</p>
+        <p class="cap">※ 探查结果显示仅为偶然。暂无法确认二人是否存在其他可疑联系。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>六 · 监控要求</h4>
+        <ul>
+          <li>按季度核查其学籍、居留与兼职状态，不进行贴身监视。</li>
+          <li>其与萧未影及其名下企业人员之接触，逐次记录。</li>
+          <li>如出现记忆恢复之迹象，或主动接触 B.C.A，立即上报 SID。</li>
+        </ul>
+        <p class="cap">※ 监控等级 LEVEL 4。本条不得向其本人或第三方披露。</p>
+      </div>
+
+      <div class="sigline">
+        <span>整理 <b>特别调查科（SID）第二组</b></span>
+        <span>复核 <b>情报分析组</b></span>
+        <span>更新 <b>2019.11.02</b></span>
+      </div>
+    </section>
+
+    <!-- ============ 词条：王青 ============ -->
+    <section class="view" id="view-doc-wangqing">
+      <div class="backlink" onclick="backToProfile()">← 返回档案</div>
+      <div class="dochd">
+        <div class="cls">LEVEL 3</div>
+        <h3>王 青</h3>
+        <div class="dsub">PERSONNEL FILE · BAHATI 火灾幸存者 · 需监控</div>
+        <div class="meta">
+          <span>姓名 <b>王青 / CHRIS</b></span>
+          <span>国籍 <b>中</b></span>
+          <span>出生 <b>1990.01.13</b></span>
+        </div>
+        <div class="meta">
+          <span>原就读 <b>BAHATI 高三</b></span>
+          <span>异能 <b>假死诱导 / B 级</b></span>
+          <span>状态 <b class="hi">定居英都 · 未恢复记忆 · 需监控</b></span>
+        </div>
+      </div>
+
+      <div class="docsec">
+        <h4>一 · 概况</h4>
+        <p>王青，英文名 CHRIS，中国籍，1990.01.13 出生。2006.09 转入 BAHATI 高三，火灾时年龄 19 岁。为该校火灾唯一公开幸存者，也是三家机构联合通报中唯一被具名之生还者。</p>
+        <p>其公开身份为英都注册心理咨询师，执业 6 年，无不良记录，无涉案记录。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>二 · 火灾与失忆</h4>
+        <p>2009.11.17 火灾当晚，其从三层跳窗，坠落于消防气垫，造成左腿胫骨骨折、肋骨骨裂 1 根，2010.01.09 出院。为通报中唯一的生还者。</p>
+        <p>其记忆缺失自入院首日即有记录：无法回忆火灾当晚情形，亦无法回忆 2009 年 9 月以后之在校生活。此后 9 年间未恢复，2019.09 最近一次临床评估仍为「逆行性记忆缺失，原因不明，无恢复迹象」。</p>
+        <p class="cap">※ 其失忆范围与另两名幸存者高度一致：均止于 2009 年秋季，均不含火灾当晚。此一致性未见解释。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>三 · 异能</h4>
+        <p>异能可概括为「假死诱导」：使目标进入可被医学判定为死亡之状态，持续 12 小时，随后自行苏醒，无后遗症。对同一目标仅能使用一次，第二次无效。</p>
+        <ul>
+          <li>触发条件：据本人陈述，须「让对方相信我就要死了」，具体机制不明。</li>
+          <li>生效时长：12 小时，误差不超过 10 分钟。</li>
+          <li>对同一目标：仅一次。使用后目标对其后续诱导完全免疫。</li>
+          <li>对自身：不适用。</li>
+        </ul>
+        <p class="cap">※ 该能力于 2012 年一次医疗纠纷中被间接证实，事后由 B.C.A 协调处理，未进入公开程序。评级 B 级，非战斗型。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>四 · 教育与职业</h4>
+        <p>2011.09 入读英都大学心理学系，2015.07 毕业；2016.03 取得英都执业资格，同年于东区开设个人咨询室，服务对象以留学生与新移民为主。</p>
+        <p>其收入稳定，无异常资金往来。居住于东区，独居，无固定伴侣。与另两名幸存者之间无任何联系记录。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>五 · B.C.A 接触尝试</h4>
+        <p>2016.10，B.C.A 经英都警察厅特别调查科出面，邀请其担任 B.C.A 内部心理顾问（兼职，非在编，需通过保密审查）。其以「与个人执业时间冲突」为由书面拒绝。</p>
+        <p>2018.03，第二次邀请，条件放宽至每月 4 小时，再次被拒。2018.06，B.C.A 以「常规心理援助项目」名义第三次接触，其未予回复，此后未再尝试。</p>
+        <p class="cap">※ 三次接触均由 SIU 名义进行，其未表现出对 B.C.A 之认知或警觉。拒绝理由前后一致，未发现受第三方影响之迹象。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>六 · 监控结论</h4>
+        <p>确认其仍未恢复记忆。其异能具备使目标被误判死亡之能力，在医疗、司法场景中风险显著；其职业恰处于可频繁接触脆弱人群之位置。</p>
+        <ul>
+          <li>监控等级 LEVEL 3，按年度复核。</li>
+          <li>不进行主动接触，不发展线人，不安排其接触 B.C.A 在办案件相关人员。</li>
+          <li>如其咨询对象中出现 B.C.A 关注对象，须在 24 小时内上报。</li>
+        </ul>
+        <p class="cap">※ 本条不得向其本人或第三方披露。其咨询记录受医疗隐私条例保护，不列入本档。</p>
+      </div>
+
+      <div class="sigline">
+        <span>整理 <b>特别调查科（SID）第二组</b></span>
+        <span>复核 <b>医务部门 / 法务部门</b></span>
+        <span>更新 <b>2019.10.21</b></span>
+      </div>
+    </section>
+
+    <!-- ============ 词条：B.C.A ============ -->
+    <section class="view" id="view-doc-bca">
+      <div class="backlink" onclick="backToProfile()">← 返回档案</div>
+      <div class="dochd">
+        <div class="cls">LEVEL 1</div>
+        <h3>B.C.A / 英 都 犯 罪 调 查 局</h3>
+        <div class="dsub">BRIDON CRIME AGENCY · 机构总览</div>
+        <div class="meta">
+          <span>全称 <b>英都犯罪调查局</b></span>
+          <span>罗马字 <b>BRIDON CRIME AGENCY</b></span>
+          <span>性质 <b>异能犯罪官方调查机构</b></span>
+        </div>
+        <div class="meta">
+          <span>前身 <b>1948 年设立之特别罪案处</b></span>
+          <span>现行建制 <b>1961 年</b></span>
+          <span>编制 <b>约 1,400 人（2019）</b></span>
+        </div>
+      </div>
+
+      <div class="docsec">
+        <h4>一 · 机构沿革</h4>
+        <p>B.C.A 成立时间较久远。其前身为 1948 年依《特别罪案处置条例》设立之特别罪案处，负责处理常规警务无法管辖之案件。1961 年改组为现制，定名英都犯罪调查局。</p>
+        <p>1970 年代起，其管辖范围逐步由「特殊案件」收窄为「涉异能之犯罪」，成为英都唯一具备异能犯罪侦查权的机构。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>二 · 性质与隶属</h4>
+        <p>B.C.A 为英都政府直属之异能犯罪官方调查机构，直接向政府负责，不隶属英都警察厅，不受地方行政区划管辖，亦不设地方分部。</p>
+        <p>其经费由中央财政单列，人员编制独立，招聘、评级、晋升、处分均依内部条例办理，不受常规公务员体系约束。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>三 · 职能</h4>
+        <ul>
+          <li>涉异能犯罪之侦查、取证、拘捕与移送。</li>
+          <li>异能者之评级、登记与分级管理。</li>
+          <li>异能制品之管制、查缉与处置。</li>
+          <li>涉异能之重大事故调查与现场处置。</li>
+          <li>跨国涉异能案件之对外协作。</li>
+        </ul>
+        <p class="cap">※ 常规刑事、治安、交通等案件不在其管辖范围内，一律移交英都警察厅。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>四 · 组织架构</h4>
+        <div class="tblwrap">
+          <table class="tbl">
+            <thead><tr><th>部门</th><th>职责</th><th>备注</th></tr></thead>
+            <tbody>
+              <tr><td>局长办公室</td><td>统筹、对外协调、重大案件审批</td><td>现任局长不公开具名</td></tr>
+              <tr><td>外勤行动组（FO）</td><td>现场处置、拘捕、专案执行</td><td>下设 7 个科，含第七特别调查科</td></tr>
+              <tr><td>特别调查科（SID）</td><td>跨国及异能重案</td><td>与警察厅 SIU 无隶属关系</td></tr>
+              <tr><td>异能搜查科</td><td>现场异能残留检测、证据鉴定</td><td>一般不参与实质侦查</td></tr>
+              <tr><td>特别人才开发部（STD）</td><td>评级、招募、培养、档案</td><td>「雏鹰计划」承办部门</td></tr>
+              <tr><td>情报分析组</td><td>监控对象名录、情报研判</td><td>沙罗会等条目由本组维护</td></tr>
+              <tr><td>技术科 / 医务 / 人事 / 法务</td><td>支持性职能</td><td>医务含心理干预</td></tr>
+              <tr><td>内部审计</td><td>纪律、财务、档案合规</td><td>直接向局长汇报</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="docsec">
+        <h4>五 · 权限与边界</h4>
+        <p>B.C.A 探员在英都境内执行任务时，不具有常规警务身份。证据采信、拘捕程序与起诉移送须经英都警察厅之渠道完成，故设有输送人员至警察厅特别调查科之机制（详见「警察厅特别调查科」条目）。</p>
+        <p>B.C.A 之搜查、扣押、收容均须内部审批；对在编探员之调查，须由内部审计启动，外勤部门不得自行处理。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>六 · 与其他机构的关系</h4>
+        <p>与英都警察厅：无隶属关系，依《联合执法备忘录》（1999）协作，警察厅下设特别调查科（SIU）为其人员输送通道。</p>
+        <p>与BAHATI 等民间机构：2001 至 2008 年间存在联合培养协议，已作废，详见「BAHATI」条目。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>七 · 现状（截至 2019.11）</h4>
+        <p>在编探员 1,183 人，其中外勤 612 人、内勤 431 人、技术及医务 140 人。登记在册异能者 3,914 人，其中 S 级 7 人、A 级 96 人、B 级 512 人。</p>
+        <p class="cap">※ 本条目为公开层级说明，不涉个案。具体人员档案依各自等级管理。</p>
+      </div>
+
+      <div class="sigline">
+        <span>维护 <b>档案室</b></span>
+        <span>复核 <b>局长办公室</b></span>
+        <span>更新 <b>2019.11.20</b></span>
+      </div>
+    </section>
+
+    <!-- ============ 彩蛋词条：程伟民 ============ -->
+    <section class="view" id="view-doc-weimin">
+      <div class="backlink" onclick="backToProfile()">← 返回档案</div>
+      <div class="dochd">
+        <div class="cls">LEVEL 5</div>
+        <h3>程 伟 民</h3>
+        <div class="dsub">PERSONNEL FILE · 内容受限</div>
+        <div class="meta">
+          <span>姓名 <b>程伟民</b></span>
+          <span>职务 <b>BAHATI 教师</b></span>
+          <span>调阅权限 <b class="warn">LEVEL 5 / 当前不足</b></span>
+        </div>
+      </div>
+
+      <div class="docsec restrict" onclick="openEsc()" role="button" tabindex="0" aria-label="内容受限，点击申请提权">
+        <div class="restrict-h">■ 本条其余内容已加密 · 点击此处申请提权</div>
+        <div class="rrow"><span class="rk">出生日期</span><span class="rv w62"></span></div>
+        <div class="rrow"><span class="rk">国籍</span><span class="rv w26"></span></div>
+        <div class="rrow"><span class="rk">入职时间</span><span class="rv w40"></span></div>
+        <div class="rrow"><span class="rk">任教科目</span><span class="rv w74"></span></div>
+        <div class="rrow"><span class="rk">异能与评级</span><span class="rv w55"></span></div>
+        <div class="rrow"><span class="rk">关联案件</span><span class="rv w88"></span></div>
+        <div class="rrow"><span class="rk">档案状态</span><span class="rv w34"></span></div>
+        <div class="restrict-body">
+          <span class="rv w96"></span><span class="rv w82"></span><span class="rv w90"></span>
+          <span class="rv w68"></span><span class="rv w86"></span><span class="rv w48"></span>
+        </div>
+        <div class="corrupt-tag" style="margin-top:16px">ENCRYPTED · 需 LEVEL 5 授权 · 本终端不具备该权限</div>
+      </div>
+
+      <p class="cap">※ 该条目由法务与人事部门联合封存，封存编号 SEAL-2009-BAHT-07。遮挡内容不可通过任何前端操作读取。</p>
+    </section>
+
+  </main>
+</div>
+
+<div class="logline">
+  <div id="log1">SYS // LINK STABLE</div>
+  <div id="log2">AUDIT // SESSION RECORDED</div>
+</div>
+
+<script src="script.js"></script>
+
+<!-- 会话到期警告弹窗 -->
+<div id="expireModal" class="expire-modal">
+  <div class="expire-box">
+    <div class="expire-icon">⚠</div>
+    <h3>访问权限已到期</h3>
+    <div class="expire-rule"></div>
+    <p>
+      本次访问为临时权限，时限已到达。<br>
+      请重新向管理员申请提权。
+    </p>
+    <p class="expire-sub">
+      SESSION EXPIRED · TEMP ACCESS / 45:00<br>
+      AUDIT LOG RECORDED
+    </p>
+    <button class="expire-btn" id="expireBtn">重新申请权限</button>
+  </div>
+</div>
+
+<!-- 越级提权弹窗（彩蛋：程伟民） -->
+<div id="escModal" class="esc-modal" role="dialog" aria-modal="true" aria-labelledby="escTitle1">
+  <div class="esc-flash"></div>
+  <div class="esc-box">
+
+    <div class="esc-step on" id="escS1">
+      <div class="esc-icon">⛔</div>
+      <h3 id="escTitle1">越 级 访 问</h3>
+      <div class="esc-rule"></div>
+      <p>目标词条：<b>程伟民</b><br>
+         所需权限：<span class="warn">LEVEL 5 / DIRECTOR</span><br>
+         当前权限：LEVEL 4 / DETECTIVE-CHIEF · 临时</p>
+      <p class="esc-sub">UNAUTHORIZED CLEARANCE ATTEMPT · 本次操作已写入审计日志</p>
+      <p class="esc-q">是否申请提权？</p>
+      <div class="esc-btns">
+        <button class="esc-btn" id="escYes">是</button>
+        <button class="esc-btn deny" id="escNo">否</button>
+      </div>
+    </div>
+
+    <div class="esc-step" id="escS2">
+      <div class="esc-icon spin">◌</div>
+      <h3>权 限 校 验</h3>
+      <div class="esc-rule"></div>
+      <p>正在读取当前用户的环境变量与权限组……</p>
+      <div class="prog"><i id="escBar"></i></div>
+      <div class="status esc-status" id="escStatus">CLEARANCE CHECK · 0%</div>
+      <p class="esc-sub">请勿关闭终端</p>
+    </div>
+
+    <div class="esc-step" id="escS3">
+      <div class="esc-icon">☣</div>
+      <h3 class="glitch">提 权 被 拒 绝</h3>
+      <div class="esc-rule"></div>
+      <p class="esc-big">当前用户并未添加到系统环境变量中，<br>不可提权。</p>
+      <p class="esc-big warn">检测到信息泄密风险，即将强制登出。</p>
+      <p class="esc-sub">SECURITY BREACH DETECTED · TERMINATING SESSION</p>
+      <div class="esc-count" id="escCount">FORCED LOGOUT · 5</div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
