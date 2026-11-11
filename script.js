@@ -9,6 +9,9 @@ function $(sel, root){ return (root || document).querySelector(sel); }
 function $$(sel, root){ return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
 function pad(n){ return String(n).padStart(2, '0'); }
 
+/* 安全认证页的计时器池（打字 / 停顿） */
+var authTimers = [];
+
 /* ---------- 日志 ---------- */
 function log(msg){
   const l1 = $('#log1'), l2 = $('#log2');
@@ -41,6 +44,7 @@ function go(n){
   if(n === 1) log('SYS // ACCESS REQUEST QUEUED');
   if(n === 3) startScan();
   if(n === 4) typeCredentials();
+  if(n === 5) prepareQuestion();
 }
 
 /* ---------- 拒绝 / 取消（终止连接） ---------- */
@@ -74,6 +78,10 @@ function resetStages(){
 
   scanning = false;
   stopTyping();
+  closePreModal();
+  resetAuthUI();
+  stopPing();
+  closeRatModal();
 }
 
 /* ---------- 活体识别 ---------- */
@@ -140,7 +148,7 @@ function typeCredentials(){
 /* ---------- 会话计时器 ---------- */
 let sessionEndAt = 0;
 let sessionTick = null;
-const SESSION_MINUTES = 45;
+const SESSION_MINUTES = 20;
 
 function startSessionTimer(){
   sessionEndAt = Date.now() + SESSION_MINUTES * 60 * 1000;
@@ -165,7 +173,7 @@ function updateSessionTimer(){
     sessionTick = null;
     const modal = $('#expireModal');
     if(modal) modal.classList.add('on');
-    log('SEC // SESSION EXPIRED · TEMP ACCESS 45:00');
+    log('SEC // SESSION EXPIRED · TEMP ACCESS 20:00');
   }
 }
 
@@ -289,6 +297,24 @@ const DOCS = [
     desc: 'BAHATI 教师 · 内容受限',
     fuzzy: false,
     keys: ['程伟民','chengweimin']
+  },
+  {
+    id: 'jae',
+    title: 'JAE LEE',
+    type: 'PERSONNEL FILE',
+    level: 4,
+    desc: '本档案对象 · 检索栏 / 命令窗口',
+    fuzzy: true,
+    keys: ['jae lee','jae','lee','李孑','本档案对象','档案对象','检索栏','命令窗口']
+  },
+  {
+    id: 'ping',
+    title: 'ping',
+    type: 'COMMAND',
+    level: 2,
+    desc: '网络诊断 · 只读命令',
+    fuzzy: false,
+    keys: ['ping']
   },
   {
     id: 'eagle',
@@ -438,10 +464,12 @@ function openDoc(id){
   if(resBox) resBox.classList.remove('on');
   const m = $('.main');
   if(m) m.scrollTop = 0;
+  if(id === 'ping') startPing(); else stopPing();
   log('IDX // DOCUMENT OPENED · ' + id.toUpperCase());
 }
 
 function backToProfile(){
+  stopPing();
   $$('.view').forEach(function(x){ x.classList.remove('on'); });
   const profile = $('#view-profile');
   if(profile) profile.classList.add('on');
@@ -463,6 +491,7 @@ function setActiveNav(v){
 
 function activateNav(item){
   const v = item.getAttribute('data-v');
+  stopPing();
   setActiveNav(v);
   $$('.view').forEach(function(x){ x.classList.remove('on'); });
   const view = document.getElementById('view-' + v);
@@ -682,3 +711,568 @@ document.addEventListener('keydown', function(e){
     openEsc();
   }
 });
+
+/* ============================================================
+   安全认证问题（登录前）
+   ============================================================ */
+const SEC_LATIN = 'vein';
+const SEC_CN = '萧未影';
+
+function clearAuthTimers(){
+  for(var i = 0; i < authTimers.length; i++){
+    clearTimeout(authTimers[i]);
+    clearInterval(authTimers[i]);
+  }
+  authTimers = [];
+}
+
+function closeAuthModals(){
+  const ok = $('#okModal');
+  const no = $('#noModal');
+  if(ok) ok.classList.remove('on');
+  if(no) no.classList.remove('on');
+  const l1 = $('#noLine1');
+  const l2 = $('#noLine2');
+  if(l1){ l1.textContent = ''; l1.classList.remove('typing'); }
+  if(l2){ l2.textContent = ''; l2.classList.remove('typing'); }
+}
+
+function resetAuthUI(){
+  clearAuthTimers();
+  closeAuthModals();
+  const inp = $('#ansInput');
+  if(inp) inp.value = '';
+}
+
+/* 进入作答页 */
+function prepareQuestion(){
+  resetAuthUI();
+  setTimeout(function(){
+    const i = $('#ansInput');
+    if(i) i.focus();
+  }, 80);
+  log('SEC // SECURITY QUESTION PRESENTED');
+}
+
+/* 判定：Vein（不分大小写） / 萧未影（严格三字） */
+function checkAnswer(){
+  const inp = $('#ansInput');
+  if(!inp) return;
+  const raw = inp.value.trim();
+  if(raw.toLowerCase() === SEC_LATIN || raw === SEC_CN) passAuth();
+  else failAuth();
+}
+
+function passAuth(){
+  clearAuthTimers();
+  const m = $('#okModal');
+  if(m) m.classList.add('on');
+  log('AUTH // SECURITY QUESTION PASSED');
+  setTimeout(function(){
+    const b = $('#okBtn');
+    if(b) b.focus();
+  }, 120);
+}
+
+/* 通过后进入终端 */
+function enterTerminal(){
+  clearAuthTimers();
+  closeAuthModals();
+  log('AUTH // ACCESS GRANTED');
+  doLogin();
+}
+
+/* 失败：打字 → 停 2s → 红字打字 → 停 2s → 回启动页 */
+function failAuth(){
+  clearAuthTimers();
+  const modal = $('#noModal');
+  const l1 = $('#noLine1');
+  const l2 = $('#noLine2');
+  if(!modal || !l1 || !l2) return;
+
+  l1.textContent = '';
+  l2.textContent = '';
+  l1.classList.add('typing');
+  modal.classList.add('on');
+  log('SEC // SECURITY QUESTION FAILED');
+
+  typeLine(l1, '这里可不欢迎不认识的小老鼠呢ᯇᴗᯇ', 70, function(){
+    l1.classList.remove('typing');
+    authTimers.push(setTimeout(function(){
+      l2.classList.add('typing');
+      typeLine(l2, '下次可要藏好了再看。', 95, function(){
+        l2.classList.remove('typing');
+        authTimers.push(setTimeout(function(){
+          closeAuthModals();
+          resetStages();
+          go(0);
+          log('SYS // CONNECTION TERMINATED');
+        }, 2000));
+      });
+    }, 2000));
+  });
+}
+
+function typeLine(el, text, speed, done){
+  let i = 0;
+  el.textContent = '';
+  const iv = setInterval(function(){
+    i++;
+    el.textContent = text.slice(0, i);
+    if(i >= text.length){
+      clearInterval(iv);
+      if(done) done();
+    }
+  }, speed);
+  authTimers.push(iv);
+}
+
+/* 回车提交 + 成功弹窗按钮（弹窗标记在脚本之后，用事件委托） */
+const ansInput = $('#ansInput');
+if(ansInput){
+  ansInput.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ e.preventDefault(); checkAnswer(); }
+  });
+}
+
+document.body.addEventListener('click', function(e){
+  if(e.target && e.target.id === 'okBtn') enterTerminal();
+});
+
+/* ============================================================
+   入组织前经历 · 申请提权（分支对话）
+   ============================================================ */
+var preTimers = [];
+
+const PRE_TREE = {
+  root: {
+    text: '请确认执行提权',
+    opts: [
+      { label: '是', to: 'q1' },
+      { label: '否', to: 'CLOSE' }
+    ]
+  },
+  q1: {
+    text: '这么好奇我的经历吗ᯇᴗᯇ',
+    opts: [
+      { label: '抱歉，但我没有恶意', to: 'soft' },
+      { label: '是的，我有些好奇', to: 'curious' }
+    ]
+  },
+  soft: {
+    beats: [
+      { text: '是吗？那最好了呢。', pause: 2000 },
+      { text: '希望这是最后一次，', cls: 'warn blink', pause: 2000 },
+      { text: '亲爱的。', newp: false, cls: 'warn blink', pause: 2000 }
+    ],
+    end: 'CLOSE'
+  },
+  curious: {
+    text: '受宠若惊呢，真的想知道吗？',
+    opts: [
+      { label: '算了', to: 'giveup' },
+      { label: '真的', to: 'sure' }
+    ]
+  },
+  giveup: {
+    beats: [
+      { text: '是吗？那最好了呢。', pause: 2000 },
+      { text: '是呢，不该看的还是不知道为好，', cls: 'warn blink', pause: 1000 },
+      { text: '亲爱的。', newp: false, cls: 'warn blink', pause: 2000 }
+    ],
+    end: 'CLOSE'
+  },
+  sure: {
+    text: '确定？',
+    opts: [
+      { label: '算了', to: 'giveup' },
+      { label: '确定', to: 'final' }
+    ]
+  },
+  final: {
+    cls: 'danger',
+    beats: [
+      { text: 'B.C.A全局共识，不该问的不问。', cls: 'warn blink', pause: 2000 },
+      { text: '那么，抓到你了，小老鼠。', cls: 'warn blink', pause: 2000 },
+      { text: '机会耗尽，这次该有惩罚了。', cls: 'warn blink', pause: 2000 }
+    ],
+    end: 'KICK'
+  }
+};
+
+function clearPreTimers(){
+  for(var i = 0; i < preTimers.length; i++){
+    clearTimeout(preTimers[i]);
+    clearInterval(preTimers[i]);
+  }
+  preTimers = [];
+}
+
+function closePreModal(){
+  clearPreTimers();
+  const m = $('#preModal');
+  if(m) m.classList.remove('on', 'flash');
+  const f = $('#preFlash');
+  if(f) f.classList.remove('on');
+  const box = $('.pre-box');
+  if(box) box.classList.remove('danger', 'pre-switch');
+  const body = $('#preBody');
+  if(body) body.innerHTML = '';
+  const opts = $('#preOpts');
+  if(opts) opts.innerHTML = '';
+}
+
+/* 打开对话：入口按钮 */
+function openPreEsc(){
+  const m = $('#preModal');
+  if(!m) return;
+  closePreModal();
+  m.classList.add('on');
+  log('SEC // PRE-RECORD ESCALATION REQUEST');
+  runPreNode('root');
+}
+
+function runPreNode(id){
+  const node = PRE_TREE[id];
+  const body = $('#preBody');
+  const opts = $('#preOpts');
+  const box  = $('.pre-box');
+  if(!node || !body || !opts) return;
+
+  opts.innerHTML = '';
+  body.innerHTML = '';
+  if(box){
+    box.classList.remove('pre-switch');
+    void box.offsetWidth;            /* 强制重排，让切换动画重播 */
+    box.classList.add('pre-switch');
+    box.classList.toggle('danger', node.cls === 'danger');
+  }
+
+  const beats = node.beats || [{ text: node.text || '', pause: 0 }];
+  playBeats(beats, 0, function(){
+    if(node.opts){ showPreOpts(node.opts); return; }
+    if(node.end === 'KICK'){ preFlashThenKick(); return; }
+    closePreModal();
+  });
+}
+
+/* 逐句打字；newp:false 表示接着上一段继续打 */
+function playBeats(beats, i, done){
+  const body = $('#preBody');
+  if(!body) return;
+  if(i >= beats.length){ done(); return; }
+
+  const b = beats[i];
+  let p = body.lastElementChild;
+  if(!p || b.newp !== false){
+    p = document.createElement('p');
+    p.className = 'pre-line' + (b.cls ? ' ' + b.cls : '');
+    body.appendChild(p);
+  }else if(b.cls){
+    p.className = 'pre-line ' + b.cls;
+  }
+
+  p.classList.add('typing');
+  typePre(p, b.text || '', b.speed || 70, function(){
+    p.classList.remove('typing');
+    if(!b.pause){ playBeats(beats, i + 1, done); return; }
+    preTimers.push(setTimeout(function(){ playBeats(beats, i + 1, done); }, b.pause));
+  });
+}
+
+function typePre(el, text, speed, done){
+  const base = el.textContent;
+  let i = 0;
+  const iv = setInterval(function(){
+    i++;
+    el.textContent = base + text.slice(0, i);
+    if(i >= text.length){ clearInterval(iv); if(done) done(); }
+  }, speed);
+  preTimers.push(iv);
+}
+
+function showPreOpts(opts){
+  const box = $('#preOpts');
+  if(!box) return;
+  box.innerHTML = '';
+  opts.forEach(function(o){
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pre-opt';
+    btn.textContent = o.label;
+    btn.addEventListener('click', function(){
+      if(o.to === 'CLOSE'){ closePreModal(); return; }
+      log('SEC // PRE-RECORD DIALOG · ' + o.label);
+      runPreNode(o.to);
+    });
+    box.appendChild(btn);
+  });
+}
+
+/* 终局：满屏红光闪烁 2 秒，再把用户踢回启动页 */
+function preFlashThenKick(){
+  const m = $('#preModal');
+  const f = $('#preFlash');
+  if(!m || !f){ preKick(); return; }
+  m.classList.add('flash');
+  f.classList.add('on');
+  log('SEC // PRE-RECORD BREACH · CONTAINMENT');
+  preTimers.push(setTimeout(function(){
+    f.classList.remove('on');
+    m.classList.remove('flash');
+    preKick();
+  }, 2000));
+}
+
+/* 最后一次「确定」：踢回启动页 */
+function preKick(){
+  closePreModal();
+  stopSessionTimer();
+  const app = $('#app');
+  if(app) app.classList.remove('active');
+  resetStages();
+  resetWorkspace();
+  go(0);
+  log('SEC // PRE-RECORD BREACH · SESSION PURGED');
+}
+
+/* ============================================================
+   JAE LEE · 已知悉提示 → 命令窗口科普
+   ============================================================ */
+var tipTimer = null;
+
+function resetKnownModal(){
+  if(tipTimer){ clearTimeout(tipTimer); tipTimer = null; }
+  const t = $('#knownTipText');
+  if(t) t.textContent = '似乎知道了检索栏同时也是特殊的【命令窗口】';
+  const q = $('#knownTipQ');
+  if(q) q.style.display = '';
+  const o = $('#knownTipOpts');
+  if(o) o.style.display = '';
+}
+
+function openKnownModal(){
+  const m = $('#knownModal');
+  if(!m) return;
+  resetKnownModal();
+  m.classList.add('on');
+  log('IDX // ACKNOWLEDGED · COMMAND WINDOW');
+}
+
+function closeKnownModal(){
+  const m = $('#knownModal');
+  if(m) m.classList.remove('on');
+  resetKnownModal();
+}
+
+function cmdHelpYes(){
+  closeKnownModal();
+  openDoc('cmdhelp');
+}
+
+function cmdHelpNo(){
+  const t = $('#knownTipText');
+  const q = $('#knownTipQ');
+  const o = $('#knownTipOpts');
+  if(t) t.textContent = '祝您探索愉快。';
+  if(q) q.style.display = 'none';
+  if(o) o.style.display = 'none';
+  tipTimer = setTimeout(function(){ closeKnownModal(); }, 1600);
+}
+
+/* ============================================================
+   命令窗口模拟（ping）
+   ============================================================ */
+var pingTimers = [];
+var pingQueue = [];
+var pingIdx = 0;
+var pingPhase = 'ping';
+
+var PING_SCRIPT = [
+  { d: 320, t: 'Microsoft Windows [版本 10.0.19045.3803]', c: 'dim2' },
+  { d: 240, t: '(c) Microsoft Corporation。保留所有权利。', c: 'dim2' },
+  { d: 300, t: '' },
+  { d: 420, t: 'C:\\root\\group\\admin> ping www.bca.com', type: true },
+  { d: 520, t: '' },
+  { d: 300, t: '正在 Ping www.bca.com [10.7.214.9] 具有 32 字节的数据:' },
+  { d: 700, t: '来自 10.7.214.9 的回复: 字节=32 时间=12ms TTL=57', c: 'ok' },
+  { d: 620, t: '来自 10.7.214.9 的回复: 字节=32 时间=11ms TTL=57', c: 'ok' },
+  { d: 640, t: '来自 10.7.214.9 的回复: 字节=32 时间=13ms TTL=57', c: 'ok' },
+  { d: 900, t: '来自 10.7.214.9 的回复: 请求超时。', c: 'err' },
+  { d: 700, t: '请求超时。', c: 'err' },
+  { d: 800, t: 'PING: 传输失败。常见故障。', c: 'err' },
+  { d: 520, t: '[ 防火墙已拦截此连接 · 规则 WIN-FW-BCA-07 ]', c: 'err' },
+  { d: 700, t: '' }
+];
+
+var RM_SCRIPT = [
+  { d: 260, t: 'C:\\root\\group\\admin> del /f /s /q *.*', type: true },
+  { d: 180, t: '正在删除 C:\\root\\group\\admin\\agents.db', c: 'err' },
+  { d: 140, t: '正在删除 C:\\root\\group\\admin\\logs\\audit-2019.log', c: 'err' },
+  { d: 130, t: '正在删除 C:\\root\\group\\admin\\cases\\C-01 … C-06', c: 'err' },
+  { d: 130, t: '正在删除 C:\\root\\group\\admin\\personnel\\*.dat', c: 'err' },
+  { d: 200, t: 'C:\\root\\group\\admin> rm -rf /', type: true, c: 'err' },
+  { d: 120, t: 'rm: 正在删除 /bin', c: 'err' },
+  { d: 100, t: 'rm: 正在删除 /etc', c: 'err' },
+  { d: 90,  t: 'rm: 正在删除 /root/group', c: 'err' },
+  { d: 90,  t: 'rm: 正在删除 /var/log', c: 'err' },
+  { d: 120, t: 'rm: 正在删除 /B.C.A', c: 'err' },
+  { d: 420, t: 'Segmentation fault (core dumped)', c: 'dim2' },
+  { d: 300, t: '' }
+];
+
+function clearPingTimers(){
+  for(var i = 0; i < pingTimers.length; i++){
+    clearTimeout(pingTimers[i]);
+    clearInterval(pingTimers[i]);
+  }
+  pingTimers = [];
+}
+
+function cmdVisible(){
+  const v = document.getElementById('view-doc-ping');
+  return !!(v && v.classList.contains('on'));
+}
+
+function startPing(){
+  clearPingTimers();
+  closeRatModal();
+  const body = $('#cmdBody');
+  if(!body) return;
+  body.innerHTML = '';
+  pingPhase = 'ping';
+  pingQueue = PING_SCRIPT;
+  pingIdx = 0;
+  pingTimers.push(setTimeout(runPingStep, 380));
+  log('CMD // PING WWW.BCA.COM');
+}
+
+function stopPing(){
+  clearPingTimers();
+  pingIdx = 0;
+}
+
+function runPingStep(){
+  if(!cmdVisible()) return;
+  const body = $('#cmdBody');
+  if(!body) return;
+  if(pingIdx >= pingQueue.length){ onCmdDone(); return; }
+
+  const s = pingQueue[pingIdx++];
+  const line = document.createElement('div');
+  line.className = 'cmd-line' + (s.c ? ' ' + s.c : '');
+  body.appendChild(line);
+
+  const next = function(){
+    body.scrollTop = body.scrollHeight;
+    pingTimers.push(setTimeout(runPingStep, s.d));
+  };
+  if(s.type) typeCmd(line, s.t, 32, pingTimers, next);
+  else { line.textContent = s.t; next(); }
+}
+
+function onCmdDone(){
+  if(pingPhase === 'rm'){ show404(); return; }
+  openRatModal();
+}
+
+/* 逐字写入（pool 决定归哪个计时器池管理） */
+function typeCmd(el, text, speed, pool, done){
+  let i = 0;
+  el.textContent = '';
+  const iv = setInterval(function(){
+    i++;
+    el.textContent = text.slice(0, i);
+    const host = el.parentElement;
+    if(host && host.classList && host.classList.contains('cmdbody')) host.scrollTop = host.scrollHeight;
+    if(i >= text.length){ clearInterval(iv); if(done) done(); }
+  }, speed);
+  pool.push(iv);
+}
+
+/* ============================================================
+   ping 警告弹窗 → rm → 404
+   ============================================================ */
+var ratTimers = [];
+var RAT_LINES = [
+  { t: '大人说的话就是不听', p: 950 },
+  { t: '已经警告过你很多次了', p: 950 },
+  { t: '还是不乖', p: 950 },
+  { t: '果然惩罚还是不够啊ᯇᴗᯇ', p: 1400, blink: true }
+];
+
+function clearRatTimers(){
+  for(var i = 0; i < ratTimers.length; i++){
+    clearTimeout(ratTimers[i]);
+    clearInterval(ratTimers[i]);
+  }
+  ratTimers = [];
+}
+
+function closeRatModal(){
+  clearRatTimers();
+  const m = $('#ratModal');
+  if(m) m.classList.remove('on');
+  const b = $('#ratBody');
+  if(b) b.innerHTML = '';
+}
+
+function openRatModal(){
+  const m = $('#ratModal');
+  const b = $('#ratBody');
+  if(!m || !b) return;
+  clearRatTimers();
+  b.innerHTML = '';
+  m.classList.add('on');
+  log('SEC // PING BLOCKED · WARNING');
+  playRatLine(0);
+}
+
+function playRatLine(i){
+  const b = $('#ratBody');
+  if(!b || i >= RAT_LINES.length) return;
+  const s = RAT_LINES[i];
+  const p = document.createElement('p');
+  p.className = 'rat-line' + (s.blink ? ' blink' : '');
+  b.appendChild(p);
+  p.classList.add('typ');
+  typeCmd(p, s.t, 62, ratTimers, function(){
+    p.classList.remove('typ');
+    ratTimers.push(setTimeout(function(){
+      if(i + 1 >= RAT_LINES.length){ finishRat(); return; }
+      playRatLine(i + 1);
+    }, s.p));
+  });
+}
+
+function finishRat(){
+  ratTimers.push(setTimeout(function(){
+    const m = $('#ratModal');
+    if(m) m.classList.remove('on');
+    clearRatTimers();
+    const b = $('#ratBody');
+    if(b) b.innerHTML = '';
+    startRm();
+  }, 1200));
+}
+
+function startRm(){
+  const body = $('#cmdBody');
+  if(!body) return;
+  pingPhase = 'rm';
+  pingQueue = RM_SCRIPT;
+  pingIdx = 0;
+  log('CMD // DEL /F /S /Q');
+  pingTimers.push(setTimeout(runPingStep, 300));
+}
+
+function show404(){
+  clearPingTimers();
+  clearRatTimers();
+  stopSessionTimer();
+  const app = $('#app');
+  if(app) app.classList.remove('active');
+  const s = $('#s404');
+  if(s) s.classList.add('active');
+  log('SYS // 404 · RESOURCE DESTROYED');
+}

@@ -17,7 +17,7 @@
 <div class="topbar">
   <div><span class="dot"></span>B.C.A / SECURE CHANNEL / ENCRYPTED</div>
   <div style="display:flex; gap:18px; align-items:center;">
-    <span id="sessionTimer" style="color:var(--amber); display:none;">TEMP // 45:00</span>
+    <span id="sessionTimer" style="color:var(--amber); display:none;">TEMP // 20:00</span>
     <span id="clock">--:--:--</span>
   </div>
 </div>
@@ -98,10 +98,46 @@
     <div class="rule"></div>
     <div class="field"><label>OPERATOR ID</label><span id="uid">————</span></div>
     <div class="field"><label>ACCESS KEY</label><span id="ukey">————</span></div>
-    <div class="field"><label>SESSION</label><span class="acc">TEMP / 45:00</span></div>
+    <div class="field"><label>SESSION</label><span class="acc">TEMP / 20:00</span></div>
     <div class="btns">
-      <button class="btn" onclick="doLogin()">登录</button>
+      <button class="btn" onclick="go(5)">登录</button>
     </div>
+  </div>
+</div>
+
+<!-- 5 · 安全认证问题 -->
+<div class="stage" id="s5">
+  <div class="box">
+    <h2>安 全 认 证</h2>
+    <div class="sub">SECURITY QUESTION · IDENTITY CONFIRMATION</div>
+    <div class="rule"></div>
+    <div class="qhead">该探员设置了安全认证问题，请回答：</div>
+    <div class="qtext">「 我跟了很多年的那个人叫什么？ 」</div>
+    <div class="qfield">
+      <span class="qpfx">&gt;</span>
+      <input id="ansInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"
+             aria-label="安全认证问题答案" placeholder="请输入答案 / ANSWER">
+    </div>
+    <div class="qhint">※ 回答错误将终止本次连接。</div>
+    <div class="btns">
+      <button class="btn" onclick="checkAnswer()">确认</button>
+      <button class="btn deny" onclick="denyExit()">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- 404 舞台（模拟） -->
+<div class="stage" id="s404">
+  <div class="box" style="text-align:center">
+    <div class="e404">404</div>
+    <div class="e404-sub">PAGE NOT FOUND</div>
+    <div class="rule" style="width:220px;margin:26px auto"></div>
+    <div class="dim" style="font-size:12.5px;letter-spacing:.26em;line-height:2.4">
+      NODE // BRIDON-HQ-07<br>
+      THE REQUESTED RESOURCE HAS BEEN REMOVED<br>
+      <span class="warn">NO RECOVERY PATH</span>
+    </div>
+    <p class="e404-tip">请刷新页面重新建立连接</p>
   </div>
 </div>
 
@@ -521,6 +557,7 @@
           该档案已由 B.C.A 法务与人事部门联合封存<br>
           封存编号：SEAL-2007-0214
         </p>
+        <button class="btn pre-esc" onclick="openPreEsc()">申请提权</button>
         <p style="margin-top:26px;color:var(--dim);font-size:12px">
           ※ 本探员入组织前经历（含监护人签署文件）不可通过常规途径调阅
         </p>
@@ -976,7 +1013,7 @@
             <i style="width:96%"></i><i style="width:88%"></i><i style="width:93%"></i>
             <i style="width:74%"></i><i style="width:86%"></i><i style="width:52%"></i>
           </div>
-          <div class="corrupt-tag">FILE CORRUPTED · 校验失败 · 内容不可恢复</div>
+          <div class="cap" style="color:var(--warn)">FILE CORRUPTED · 校验失败 · 内容不可恢复</div>
         </div>
         <p class="cap" style="color:var(--warn)">※ 该文件在 2011 年档案数字化迁移中损坏，原始纸质件已依流程销毁。现存仅此损坏副本，恢复尝试 3 次均失败。</p>
       </div>
@@ -1345,10 +1382,136 @@
           <span class="rv w96"></span><span class="rv w82"></span><span class="rv w90"></span>
           <span class="rv w68"></span><span class="rv w86"></span><span class="rv w48"></span>
         </div>
-        <div class="corrupt-tag" style="margin-top:16px">ENCRYPTED · 需 LEVEL 5 授权 · 本终端不具备该权限</div>
+        <div class="cap">ENCRYPTED · 需 LEVEL 5 授权 · 本终端不具备该权限</div>
       </div>
 
       <p class="cap">※ 该条目由法务与人事部门联合封存，封存编号 SEAL-2009-BAHT-07。遮挡内容不可通过任何前端操作读取。</p>
+    </section>
+
+    <!-- ============ 词条：JAE LEE ============ -->
+    <section class="view" id="view-doc-jae">
+      <div class="backlink" onclick="backToProfile()">← 返回档案</div>
+      <div class="dochd">
+        <div class="cls">LEVEL 4</div>
+        <h3>JAE LEE</h3>
+        <div class="dsub">PERSONNEL FILE · 本档案对象</div>
+        <div class="meta">
+          <span>姓名 <b>李孑 / JAE LEE</b></span>
+          <span>编号 <b>BCA-FO-SGT-0214</b></span>
+          <span>状态 <b class="hi">待归队 · 个人事假</b></span>
+        </div>
+      </div>
+
+      <div class="docsec">
+        <h4>一 · 关于本档案</h4>
+        <p>本档案记录的探员即为JAE LEE。</p>
+        <p>B.C.A 的探员信息量极大。因此，各类详细记录一般不会全部摆在终端的开始页面上，避免每位探员档案信息冗余。</p>
+        <p>对却有需求的访问者，B.C.A 于终端顶部加了检索功能，以便用户详细查阅。同时，为面向探员特殊需求，B.C.A 专用操作系统添加了移动端唤起命令窗口功能。</p>
+        <p class="cap">※ 检索栏直连 B.C.A 内部专用操作系统的内核。</p>
+      </div>
+
+      <div class="docsec ack-row">
+        <button class="btn ack-btn" onclick="openKnownModal()">已知悉</button>
+      </div>
+    </section>
+
+    <!-- ============ 词条：命令窗口科普 ============ -->
+    <section class="view" id="view-doc-cmdhelp">
+      <div class="backlink" onclick="backToProfile()">← 返回档案</div>
+      <div class="dochd">
+        <div class="cls">LEVEL 1</div>
+        <h3>命 令 窗 口</h3>
+        <div class="dsub">COMMAND LINE · 常识科普 · 欢迎进入科普小课堂XD</div>
+        <div class="meta">
+          <span>类别 <b>常识</b></span>
+          <span>来源 <b>技术科</b></span>
+          <span>阅读时长 <b>约 2 分钟</b></span>
+        </div>
+      </div>
+
+      <div class="docsec">
+        <h4>一 · 什么是命令窗口</h4>
+        <p>命令窗口，也叫终端、命令行界面（CLI）。它不是软件，是操作系统给自己留的一扇门：在里面打字，系统会直接照做。没有按钮，没有图标，也没有"确定要执行吗"。</p>
+        <p>而当今电脑手机的图形化界面，本质上是终端外面多套了一层好看的壳，代替我们和操作系统交流。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>二 · 它在不同系统里长什么样</h4>
+        <ul>
+          <li>Windows：叫「命令提示符」（<code>cmd.exe</code>）或 PowerShell，黑底白字，开头通常是 <code>C:\Users\你的名字&gt;</code>。</li>
+          <li>macOS：叫「终端」（Terminal），黑底白字，开头通常是 <code>用户名@主机名 ~ %</code>。</li>
+          <li>Linux：同样是终端，提示符常见 <code>root@group:~#</code>。</li>
+        </ul>
+        <p class="cap">※ 长相各不相同，脾气一模一样：你说什么，它就做什么，几乎都是零帧起手，再无二次确认和撤回命令的动作。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>三 · 它和图形界面差在哪</h4>
+        <p>图形界面（GUI）是你点图标、拖文件、右键菜单。每走一步，系统都在它给你的选项里替你挡掉了大半危险动作。</p>
+        <p>命令窗口（CLI）没有这层保护。一条命令可以同时处理几千个文件，也可以在一秒之内把整台机器清空。它快，是因为它不会问你。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>四 · 来举个例子吧——两条最基础的命令</h4>
+        <p><b>1 · ping</b> —— 测试网络通不通。</p>
+        <pre class="order">C:\root\group\admin&gt; ping www.bca.com
+
+正在 Ping www.bca.com [10.7.214.9] 具有 32 字节的数据:
+来自 10.7.214.9 的回复: 字节=32 时间=12ms TTL=57
+来自 10.7.214.9 的回复: 字节=32 时间=11ms TTL=57</pre>
+        <p>它只是往对面丢几个小包，看有没有回音。<b>不改文件，不装东西</b>，所以它安全，也最常被拿来"随便试试"。</p>
+
+        <p style="margin-top:16px"><b>2 · rm</b> —— 删除。</p>
+        <pre class="order">rm -f 文件名      # -f：force，不询问，直接删
+rm -rf 目录/      # -r：递归，连里面的东西一起删</pre>
+        <p>Windows 里对应的是 <code>del /f /s /q</code>。参数 <code>-f</code> 的意思只有一个：别问我了，删。</p>
+      </div>
+
+      <div class="docsec">
+        <h4>五 · 关于那条不该打的命令</h4>
+        <p>关于那条 <code>rm -rf /</code> 。</p>
+        <div class="dangerbox">
+          <div class="dangerbox-t">⚠ 这不是梗</div>
+          <p><code>rm -rf /</code> 会从根目录开始，递归、强制、不询问地删掉系统里的一切：系统文件、数据库、备份、日志——包括本可以证明是谁删的那份日志。</p>
+          <p>结果通常是：服务器当场报废，数据无法恢复，业务停摆，损失按分钟算。然后人事会找你，法务会找你，可能还有警察。</p>
+          <p class="dangerbox-b">轻则当天收拾东西走人，重则法庭见orz</p>
+          <p>非常感谢你能看到这里口牙，接下来说不定能探索到新彩蛋？</p>
+        </div>
+      </div>
+
+      <div class="sigline">
+        <span>整理 <b>技术科 · 常识普及组</b></span>
+        <span>复核 <b>法务部门</b></span>
+        <span>更新 <b>2019.11.20</b></span>
+      </div>
+    </section>
+
+    <!-- ============ 词条：ping ============ -->
+    <section class="view" id="view-doc-ping">
+      <div class="backlink" onclick="backToProfile()">← 返回档案</div>
+      <div class="dochd">
+        <div class="cls">LEVEL 2</div>
+        <h3>PING</h3>
+        <div class="dsub">COMMAND · 网络诊断 · 只读</div>
+        <div class="meta">
+          <span>类型 <b>只读命令</b></span>
+          <span>作用 <b>测试网络连通性</b></span>
+          <span>危险等级 <b>低</b></span>
+        </div>
+      </div>
+
+      <div class="docsec">
+        <h4>一 · 说明</h4>
+        <p>ping 只向外发送探测包，不修改任何文件，是权限最低、最常被使用的诊断命令。</p>
+      </div>
+
+      <div class="cmdwin" id="cmdWin">
+        <div class="cmdbar">
+          <span>命令提示符 · cmd.exe</span>
+          <span class="cmdbar-x">✕</span>
+        </div>
+        <div class="cmdbody" id="cmdBody"></div>
+      </div>
     </section>
 
   </main>
@@ -1372,7 +1535,7 @@
       请重新向管理员申请提权。
     </p>
     <p class="expire-sub">
-      SESSION EXPIRED · TEMP ACCESS / 45:00<br>
+      SESSION EXPIRED · TEMP ACCESS / 20:00<br>
       AUDIT LOG RECORDED
     </p>
     <button class="expire-btn" id="expireBtn">重新申请权限</button>
@@ -1419,6 +1582,57 @@
       <div class="esc-count" id="escCount">FORCED LOGOUT · 5</div>
     </div>
 
+  </div>
+</div>
+
+<!-- JAE LEE · 已知悉提示 -->
+<div id="knownModal" class="tip-modal" role="dialog" aria-modal="true" aria-label="提示">
+  <div class="tip-box">
+    <div class="tip-icon">!</div>
+    <div class="tip-body">
+      <p class="tip-line" id="knownTipText">似乎知道了检索栏同时也是特殊的【命令窗口】</p>
+      <p class="tip-q" id="knownTipQ">是否需要科普【命令窗口】？</p>
+      <div class="tip-opts" id="knownTipOpts">
+        <button class="tip-opt" onclick="cmdHelpYes()">是</button>
+        <button class="tip-opt" onclick="cmdHelpNo()">否</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ping · 警告弹窗 -->
+<div id="ratModal" class="rat-modal" role="dialog" aria-modal="true" aria-label="警告">
+  <div class="rat-box">
+    <div class="rat-body" id="ratBody"></div>
+  </div>
+</div>
+
+<!-- 安全认证 · 通过 -->
+<div id="okModal" class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="okTitle">
+  <div class="auth-box ok">
+    <div class="okicon">✓</div>
+    <h3 id="okTitle">登 录 成 功</h3>
+    <div class="okrule"></div>
+    <p>安全认证通过，正在载入档案终端。</p>
+    <p class="oksub">AUTH // SECURITY QUESTION VERIFIED</p>
+    <button class="okbtn" id="okBtn">进入终端</button>
+  </div>
+</div>
+
+<!-- 安全认证 · 失败 -->
+<div id="noModal" class="auth-modal" role="dialog" aria-modal="true" aria-label="认证失败">
+  <div class="auth-box bad">
+    <p class="line l-body" id="noLine1"></p>
+    <p class="line l-bad" id="noLine2"></p>
+  </div>
+</div>
+
+<!-- 入组织前经历 · 提权对话 -->
+<div id="preModal" class="pre-modal" role="dialog" aria-modal="true" aria-label="申请提权">
+  <div class="pre-flash" id="preFlash"></div>
+  <div class="pre-box">
+    <div class="pre-body" id="preBody"></div>
+    <div class="pre-opts" id="preOpts"></div>
   </div>
 </div>
 
