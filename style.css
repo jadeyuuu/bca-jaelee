@@ -113,7 +113,7 @@ h2{font-size:17px; letter-spacing:.22em; font-weight:400; color:var(--txt2)}
 .logout{margin:14px 22px 0; font-size:12px; letter-spacing:.2em; color:var(--dim); cursor:pointer;
   border:1px solid var(--line); padding:9px; text-align:center; transition:.2s}
 .logout:hover{color:var(--warn); border-color:var(--warn)}
-.main{overflow-y:auto; overflow-x:hidden; height:100%; padding:34px 42px 80px; min-width:0}
+.main{overflow-y:auto; overflow-x:hidden; height:100%; padding:0 42px 80px; min-width:0}
 .main::-webkit-scrollbar,.nav::-webkit-scrollbar{width:6px;height:6px}
 .main::-webkit-scrollbar-thumb,.nav::-webkit-scrollbar-thumb{background:var(--line2)}
 .view{display:none}
@@ -124,10 +124,16 @@ h2{font-size:17px; letter-spacing:.22em; font-weight:400; color:var(--txt2)}
 .vsub{font-size:12px; letter-spacing:.26em; color:var(--dim); margin-top:8px}
 hr.sep{border:0; height:1px; background:var(--line); margin:22px 0 26px}
 
-/* ===== 检索栏 ===== */
+/* ===== 检索栏（吸顶） ===== */
 .searchwrap{
-  position: relative; /* 普通文档流，不悬浮吸附 */
-  margin: 0 0 20px;
+  position: sticky; top: 0; z-index: 20;   /* 跟随 .main 滚动容器，滚到顶后固定 */
+  /* 左右负边距吃掉 .main 的内边距，吸顶时背景铺满整行；上下内边距由本栏自己给 */
+  margin: 0 -42px 20px;
+  padding: 34px 42px 12px;
+  background: rgba(5,8,10,.93);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 14px 24px -22px rgba(0,0,0,.95);
 }
 .searchbox{display:flex; align-items:center; gap:12px;
   border:1px solid var(--line2); padding:11px 14px;
@@ -220,9 +226,10 @@ hr.sep{border:0; height:1px; background:var(--line); margin:22px 0 26px}
 .row .v.r{color:var(--warn)}
 .row .v.a{color:var(--amber)}
 
-.sigbox{border:1px solid var(--line); padding:16px; margin-top:26px; background:rgba(10,17,20,.5)}
+.sigbox{border:1px solid var(--line); padding:16px; margin-top:26px; background:rgba(10,17,20,.5); max-width:620px}
 .sigbox .lbl{font-size:11.5px; letter-spacing:.26em; color:var(--dim); display:flex; justify-content:space-between; gap:12px}
-.sig{width:100%; height:64px; margin-top:10px}
+/* 笔迹图版：按 viewBox 原始 420:64 比例缩放，不再横向拉伸 */
+.sig{display:block; width:100%; height:auto; aspect-ratio:420/64; margin-top:10px}
 .sigmeta{display:flex; gap:26px; font-size:12px; letter-spacing:.16em; color:var(--dim); margin-top:8px; flex-wrap:wrap}
 
 .case{border:1px solid var(--line); margin-bottom:12px; background:rgba(9,15,18,.5); transition:.2s}
@@ -286,7 +293,7 @@ hr.sep{border:0; height:1px; background:var(--line); margin:22px 0 26px}
   .nav-item{white-space:nowrap; padding:13px 16px; border-left:0;
     border-bottom:2px solid transparent;}
   .nav-item.on{border-left:0; border-bottom-color:var(--acc); background:rgba(79,224,192,.06);}
-  .main{padding:22px 16px 64px;}
+  .main{padding:0 16px 64px;}
   .vtitle{font-size:15.5px; letter-spacing:.18em; gap:6px;}
   .vsub{font-size:11px; letter-spacing:.18em;}
   .profile-head{flex-direction:column; gap:18px;}
@@ -309,7 +316,7 @@ hr.sep{border:0; height:1px; background:var(--line); margin:22px 0 26px}
   .logline{display:none;}
   .med{min-width:620px;}
 
-  .searchwrap{margin:-22px -16px 20px; padding:14px 16px 12px;}
+  .searchwrap{margin:0 -16px 20px; padding:14px 16px 12px;}
   .searchbox{padding:9px 11px; gap:9px;}
   .searchbox input{font-size:13.5px;}
   .searchbox .hint{display:none;}
