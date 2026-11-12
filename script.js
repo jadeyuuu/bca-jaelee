@@ -82,6 +82,7 @@ function resetStages(){
   resetAuthUI();
   stopPing();
   closeRatModal();
+  closeConsent();
 }
 
 /* ---------- 活体识别 ---------- */
@@ -269,7 +270,7 @@ const DOCS = [
     level: 4,
     desc: '火灾幸存者 · 英都皇家学院在读 · 需监控',
     fuzzy: true,
-    keys: ['夏斐','xiafei','felix','皇家学院','模特','萧未影','失忆']
+    keys: ['夏斐','xiafei','felix','皇家学院','模特','失忆']
   },
   {
     id: 'wangqing',
@@ -303,18 +304,9 @@ const DOCS = [
     title: 'JAE LEE',
     type: 'PERSONNEL FILE',
     level: 4,
-    desc: '本档案对象 · 检索栏 / 命令窗口',
+    desc: '本档案对象 · 档案说明',
     fuzzy: true,
-    keys: ['jae lee','jae','lee','李孑','本档案对象','档案对象','检索栏','命令窗口']
-  },
-  {
-    id: 'ping',
-    title: 'ping',
-    type: 'COMMAND',
-    level: 2,
-    desc: '网络诊断 · 只读命令',
-    fuzzy: false,
-    keys: ['ping']
+    keys: ['jae lee','jae','lee','李孑','本档案对象','档案对象']
   },
   {
     id: 'eagle',
@@ -404,16 +396,27 @@ function renderResults(list, opts){
 }
 
 /* ---------- 检索 ---------- */
+/* help / ping 不是词条，是命令：输入后需按 Enter 才执行 */
+function asCommand(q){
+  if(q === 'help' || q === 'ping') return q;
+  return '';
+}
+
 function doSearch(){
   if(!qInput || !resBox) return;
   const raw = qInput.value.trim();
   const q = raw.toLowerCase();
   if(!q){ resBox.classList.remove('on'); resBox.innerHTML = ''; return; }
 
-  // help：输出全部可检索词条，不含 help 本身
-  if(q === 'help'){
-    renderResults(DOCS, { head: 'QUERY HELP · 全部可检索词条 · 共 ' + DOCS.length + ' 条' });
-    log('IDX // HELP · ' + DOCS.length + ' ENTRIES LISTED');
+  const cmd = asCommand(q);
+  if(cmd){
+    resBox.innerHTML =
+      '<div class="res-item res-cmd" data-cmd="' + cmd + '" role="button" tabindex="0">' +
+        '<span class="rk">⌘</span>' +
+        '<div class="rt"><b>' + cmd + '</b>' +
+        '<small><span class="lv">CMD</span>命令 · 按 ENTER 执行</small></div></div>';
+    resBox.classList.add('on');
+    log('IDX // COMMAND · ' + cmd.toUpperCase());
     return;
   }
 
@@ -421,10 +424,17 @@ function doSearch(){
   log('IDX // QUERY · ' + raw.toUpperCase());
 }
 
+function runCommand(name){
+  if(name === 'help') enterHelp();
+  else if(name === 'ping') enterPing();
+}
+
 if(qInput){
   qInput.addEventListener('input', doSearch);
   qInput.addEventListener('keydown', function(e){
     if(e.key === 'Enter'){
+      const cmd = asCommand(qInput.value.trim().toLowerCase());
+      if(cmd){ runCommand(cmd); return; }
       const first = resBox ? resBox.querySelector('.res-item') : null;
       if(first) first.click();
     }
@@ -438,11 +448,15 @@ if(qInput){
 /* 事件委托：检索结果点击 / 键盘 */
 if(resBox){
   resBox.addEventListener('click', function(e){
+    const cmdEl = e.target.closest('.res-cmd');
+    if(cmdEl){ runCommand(cmdEl.getAttribute('data-cmd')); return; }
     const item = e.target.closest('.res-item');
     if(item) openDoc(item.getAttribute('data-id'));
   });
   resBox.addEventListener('keydown', function(e){
     if(e.key !== 'Enter' && e.key !== ' ') return;
+    const cmdEl = e.target.closest('.res-cmd');
+    if(cmdEl){ e.preventDefault(); runCommand(cmdEl.getAttribute('data-cmd')); return; }
     const item = e.target.closest('.res-item');
     if(item){ e.preventDefault(); openDoc(item.getAttribute('data-id')); }
   });
@@ -464,7 +478,6 @@ function openDoc(id){
   if(resBox) resBox.classList.remove('on');
   const m = $('.main');
   if(m) m.scrollTop = 0;
-  if(id === 'ping') startPing(); else stopPing();
   log('IDX // DOCUMENT OPENED · ' + id.toUpperCase());
 }
 
@@ -668,23 +681,18 @@ function escFail(){
     if(left <= 0){
       clearInterval(iv);
       escInts = escInts.filter(function(x){ return x !== iv; });
-      forcedLogout();
+      escTo404();
     }
   }, 1000);
   escInts.push(iv);
 }
 
-/* 强制登出：回到「建立安全连接」启动界面（可重新登录） */
-function forcedLogout(){
+/* 提权失败：断开并落到 404（只能刷新恢复） */
+function escTo404(){
   closeEsc();
   resetEsc();
-  stopSessionTimer();
-  const app = $('#app');
-  if(app) app.classList.remove('active');
-  resetStages();
-  resetWorkspace();
-  go(0);
-  log('SEC // FORCED DISCONNECT · SESSION PURGED');
+  log('SEC // ESCALATION REVOKED');
+  show404();
 }
 
 /* 弹窗按钮（弹窗标记位于脚本之后，故用事件委托） */
@@ -796,11 +804,11 @@ function failAuth(){
   modal.classList.add('on');
   log('SEC // SECURITY QUESTION FAILED');
 
-  typeLine(l1, '这里可不欢迎不认识的小老鼠呢ᯇᴗᯇ', 70, function(){
+  typeLine(l1, '答错了，这里可不欢迎不认识的小老鼠呢ᯇᴗᯇ', 70, function(){
     l1.classList.remove('typing');
     authTimers.push(setTimeout(function(){
       l2.classList.add('typing');
-      typeLine(l2, '下次可要藏好了再看。', 95, function(){
+      typeLine(l2, '下次可要查仔细点再来看我的档案。', 95, function(){
         l2.classList.remove('typing');
         authTimers.push(setTimeout(function(){
           closeAuthModals();
@@ -846,44 +854,44 @@ var preTimers = [];
 
 const PRE_TREE = {
   root: {
-    text: '请确认执行提权',
+    text: '请确认是否执行提权：',
     opts: [
       { label: '是', to: 'q1' },
       { label: '否', to: 'CLOSE' }
     ]
   },
   q1: {
-    text: '这么好奇我的经历吗ᯇᴗᯇ',
+    text: '看够了吗，这么好奇我的经历吗ᯇᴗᯇ',
     opts: [
-      { label: '抱歉，但我没有恶意', to: 'soft' },
-      { label: '是的，我有些好奇', to: 'curious' }
+      { label: '抱歉，我没有恶意', to: 'soft' },
+      { label: '有些好奇', to: 'curious' }
     ]
   },
   soft: {
     beats: [
       { text: '是吗？那最好了呢。', pause: 2000 },
-      { text: '希望这是最后一次，', cls: 'warn blink', pause: 2000 },
-      { text: '亲爱的。', newp: false, cls: 'warn blink', pause: 2000 }
+      { text: '毕竟不该看的，还是不看为好，', cls: 'warn blink', pause: 2000 },
+      { text: '对吧ᯇᴗᯇ', newp: false, cls: 'warn blink', pause: 2000 }
     ],
     end: 'CLOSE'
   },
   curious: {
-    text: '受宠若惊呢，真的想知道吗？',
+    text: '受宠若惊啊，真的想知道吗？',
     opts: [
-      { label: '算了', to: 'giveup' },
+      { label: '算了', to: 'soft' },
       { label: '真的', to: 'sure' }
     ]
   },
   giveup: {
     beats: [
       { text: '是吗？那最好了呢。', pause: 2000 },
-      { text: '是呢，不该看的还是不知道为好，', cls: 'warn blink', pause: 1000 },
+      { text: '希望这是你最后一次越界，', cls: 'warn blink', pause: 1000 },
       { text: '亲爱的。', newp: false, cls: 'warn blink', pause: 2000 }
     ],
     end: 'CLOSE'
   },
   sure: {
-    text: '确定？',
+    text: '真是执着呢，真的确定？',
     opts: [
       { label: '算了', to: 'giveup' },
       { label: '确定', to: 'final' }
@@ -892,9 +900,9 @@ const PRE_TREE = {
   final: {
     cls: 'danger',
     beats: [
-      { text: 'B.C.A全局共识，不该问的不问。', cls: 'warn blink', pause: 2000 },
-      { text: '那么，抓到你了，小老鼠。', cls: 'warn blink', pause: 2000 },
-      { text: '机会耗尽，这次该有惩罚了。', cls: 'warn blink', pause: 2000 }
+      { text: '你知道吗，B.C.A有一个全局共识，不该问的不问。', cls: 'warn', pause: 2000 },
+      { text: '看来你不会是 B.C.A 的人。抓到你了，小老鼠。', cls: 'warn', pause: 2000 },
+      { text: '已经给过你很多次机会了，这次，该有惩罚了。', cls: 'warn blink', pause: 2000 }
     ],
     end: 'KICK'
   }
@@ -911,7 +919,7 @@ function clearPreTimers(){
 function closePreModal(){
   clearPreTimers();
   const m = $('#preModal');
-  if(m) m.classList.remove('on', 'flash');
+  if(m) m.classList.remove('on', 'flash', 'purge');
   const f = $('#preFlash');
   if(f) f.classList.remove('on');
   const box = $('.pre-box');
@@ -1009,17 +1017,17 @@ function showPreOpts(opts){
   });
 }
 
-/* 终局：满屏红光闪烁 2 秒，再把用户踢回启动页 */
+/* 终局：满屏红光闪烁 2 秒，期间把对话换成驱逐警告，然后踢回启动页 */
 function preFlashThenKick(){
   const m = $('#preModal');
   const f = $('#preFlash');
   if(!m || !f){ preKick(); return; }
-  m.classList.add('flash');
+  m.classList.add('flash', 'purge');
   f.classList.add('on');
   log('SEC // PRE-RECORD BREACH · CONTAINMENT');
   preTimers.push(setTimeout(function(){
     f.classList.remove('on');
-    m.classList.remove('flash');
+    m.classList.remove('flash', 'purge');
     preKick();
   }, 2000));
 }
@@ -1089,12 +1097,8 @@ var pingIdx = 0;
 var pingPhase = 'ping';
 
 var PING_SCRIPT = [
-  { d: 320, t: 'Microsoft Windows [版本 10.0.19045.3803]', c: 'dim2' },
-  { d: 240, t: '(c) Microsoft Corporation。保留所有权利。', c: 'dim2' },
-  { d: 300, t: '' },
-  { d: 420, t: 'C:\\root\\group\\admin> ping www.bca.com', type: true },
-  { d: 520, t: '' },
-  { d: 300, t: '正在 Ping www.bca.com [10.7.214.9] 具有 32 字节的数据:' },
+  { d: 360, t: '' },
+  { d: 320, t: '正在 Ping www.bca.com [10.7.214.9] 具有 32 字节的数据:' },
   { d: 700, t: '来自 10.7.214.9 的回复: 字节=32 时间=12ms TTL=57', c: 'ok' },
   { d: 620, t: '来自 10.7.214.9 的回复: 字节=32 时间=11ms TTL=57', c: 'ok' },
   { d: 640, t: '来自 10.7.214.9 的回复: 字节=32 时间=13ms TTL=57', c: 'ok' },
@@ -1129,50 +1133,181 @@ function clearPingTimers(){
   pingTimers = [];
 }
 
-function cmdVisible(){
-  const v = document.getElementById('view-doc-ping');
-  return !!(v && v.classList.contains('on'));
+function stopPing(){
+  clearPingTimers();
+  pingIdx = 0;
+  vnTyping = false;
+}
+
+/* 往黑窗里追加一行 */
+function cmdAppend(text, cls){
+  const body = $('#cmdBody');
+  if(!body) return null;
+  const el = document.createElement('div');
+  el.className = 'cmd-line' + (cls ? ' ' + cls : '');
+  el.textContent = text;
+  body.appendChild(el);
+  body.scrollTop = body.scrollHeight;
+  return el;
+}
+
+/* ---------- 进入命令窗口舞台 ---------- */
+function enterPing(){
+  hideAllStages();
+  const app = $('#app');
+  if(app) app.classList.remove('active');
+  const s = $('#sPing');
+  if(s) s.classList.add('active');
+  if(resBox) resBox.classList.remove('on');
+  startPing();
 }
 
 function startPing(){
   clearPingTimers();
+  clearRatTimers();
   closeRatModal();
+  closeConsent();
+  hideVn();
+
   const body = $('#cmdBody');
-  if(!body) return;
-  body.innerHTML = '';
-  pingPhase = 'ping';
-  pingQueue = PING_SCRIPT;
-  pingIdx = 0;
-  pingTimers.push(setTimeout(runPingStep, 380));
-  log('CMD // PING WWW.BCA.COM');
+  if(body){
+    body.innerHTML = '';
+    const ghost = document.createElement('div');
+    ghost.className = 'cmd-line ghost';
+    ghost.textContent = 'ping www.bca.com';
+    body.appendChild(ghost);
+  }
+
+  const row = $('#cmdInputRow');
+  if(row) row.classList.add('hide');
+  const inp = $('#cmdInput');
+  if(inp){ inp.value = ''; inp.disabled = false; }
+
+  log('CMD // SHELL OPENED');
+  openVn();
 }
 
-function stopPing(){
-  clearPingTimers();
-  pingIdx = 0;
+/* ---------- 文游对话框 ---------- */
+var VN_LINES = [
+  '原来 B.C.A 的终端居然真的有这种功能……是不是输入命令的关键字后都会直接唤起命令窗口呢？',
+  '那正好，已经打开了的话，顺便来试试网络连通性吧，就测试 B.C.A 的网站好了。',
+  '跟着打出这行命令——ping www.bca.com，按下 Enter 即可。'
+];
+var vnIndex = 0;
+var vnTyping = false;
+var vnInt = null;
+
+function openVn(){
+  const box = $('#vnBox');
+  if(!box) return;
+  box.classList.add('on');
+  vnIndex = 0;
+  showVnLine(0);
+}
+
+function showVnLine(i){
+  const t = $('#vnText');
+  if(!t) return;
+  if(i >= VN_LINES.length){ closeVn(); return; }
+  vnIndex = i;
+  typeVn(t, VN_LINES[i], 52);
+}
+
+function typeVn(el, text, speed){
+  let i = 0;
+  el.textContent = '';
+  vnTyping = true;
+  const iv = setInterval(function(){
+    i++;
+    el.textContent = text.slice(0, i);
+    if(i >= text.length){ clearInterval(iv); vnTyping = false; }
+  }, speed);
+  vnInt = iv;
+  pingTimers.push(iv);
+}
+
+function vnAdvance(){
+  const box = $('#vnBox');
+  if(!box || !box.classList.contains('on')) return;
+  if(vnTyping){
+    if(vnInt) clearInterval(vnInt);
+    vnTyping = false;
+    const t = $('#vnText');
+    if(t) t.textContent = VN_LINES[vnIndex] || '';
+    return;
+  }
+  showVnLine(vnIndex + 1);
+}
+
+function hideVn(){
+  if(vnInt){ clearInterval(vnInt); vnInt = null; }
+  vnTyping = false;
+  const box = $('#vnBox');
+  if(box) box.classList.remove('on');
+  const t = $('#vnText');
+  if(t) t.textContent = '';
+}
+
+function closeVn(){
+  hideVn();
+  const row = $('#cmdInputRow');
+  if(row) row.classList.remove('hide');
+  const inp = $('#cmdInput');
+  if(inp){
+    inp.value = '';
+    setTimeout(function(){ inp.focus(); }, 90);
+  }
+  log('CMD // INPUT READY');
+}
+
+/* ---------- 命令提交 ---------- */
+function submitCommand(value){
+  const raw = (value || '').trim();
+  if(!raw) return;
+
+  const inp = $('#cmdInput');
+  if(inp) inp.value = '';
+  cmdAppend('C:\\root\\group\\admin> ' + raw);
+
+  const norm = raw.toLowerCase().replace(/\s+/g, ' ');
+
+  if(norm === 'ping www.bca.com'){
+    if(inp) inp.disabled = true;
+    const row = $('#cmdInputRow');
+    if(row) row.classList.add('hide');
+    log('CMD // PING WWW.BCA.COM');
+    pingTimers.push(setTimeout(function(){
+      pingPhase = 'ping';
+      pingQueue = PING_SCRIPT;
+      pingIdx = 0;
+      runPingStep();
+    }, 420));
+    return;
+  }
+
+  if(norm.indexOf('ping') === 0){
+    cmdAppend('用法: ping 目标名称', 'dim2');
+    cmdAppend('提示: 请输入屏幕上那条命令。', 'dim2');
+  }else{
+    cmdAppend("'" + raw + "' 不是内部或外部命令，也不是可运行的程序或批处理文件。", 'err');
+  }
+  if(inp) inp.focus();
 }
 
 function runPingStep(){
-  if(!cmdVisible()) return;
-  const body = $('#cmdBody');
-  if(!body) return;
   if(pingIdx >= pingQueue.length){ onCmdDone(); return; }
-
   const s = pingQueue[pingIdx++];
-  const line = document.createElement('div');
-  line.className = 'cmd-line' + (s.c ? ' ' + s.c : '');
-  body.appendChild(line);
+  const line = cmdAppend(s.t, s.c);
 
   const next = function(){
-    body.scrollTop = body.scrollHeight;
     pingTimers.push(setTimeout(runPingStep, s.d));
   };
-  if(s.type) typeCmd(line, s.t, 32, pingTimers, next);
-  else { line.textContent = s.t; next(); }
+  if(s.type && line) typeCmd(line, s.t, 32, pingTimers, next);
+  else next();
 }
 
 function onCmdDone(){
-  if(pingPhase === 'rm'){ show404(); return; }
+  if(pingPhase === 'rm'){ showBSOD(); return; }
   openRatModal();
 }
 
@@ -1198,7 +1333,7 @@ var RAT_LINES = [
   { t: '大人说的话就是不听', p: 950 },
   { t: '已经警告过你很多次了', p: 950 },
   { t: '还是不乖', p: 950 },
-  { t: '果然惩罚还是不够啊ᯇᴗᯇ', p: 1400, blink: true }
+  { t: '果然惩罚——还是不够啊ᯇᴗᯇ', p: 1400, blink: true }
 ];
 
 function clearRatTimers(){
@@ -1252,7 +1387,7 @@ function finishRat(){
     clearRatTimers();
     const b = $('#ratBody');
     if(b) b.innerHTML = '';
-    startRm();
+    openConsent();
   }, 1200));
 }
 
@@ -1270,9 +1405,151 @@ function show404(){
   clearPingTimers();
   clearRatTimers();
   stopSessionTimer();
+  hideAllStages();
   const app = $('#app');
   if(app) app.classList.remove('active');
   const s = $('#s404');
   if(s) s.classList.add('active');
   log('SYS // 404 · RESOURCE DESTROYED');
 }
+
+/* 蓝屏（ping 流的终点） */
+var bsodTimer = null;
+
+function showBSOD(){
+  clearPingTimers();
+  clearRatTimers();
+  stopSessionTimer();
+  hideAllStages();
+  const app = $('#app');
+  if(app) app.classList.remove('active');
+  const s = $('#sBSOD');
+  if(s) s.classList.add('active');
+
+  const el = $('#bsodPct');
+  if(el) el.textContent = '0';
+  if(bsodTimer){ clearInterval(bsodTimer); bsodTimer = null; }
+  let p = 0;
+  bsodTimer = setInterval(function(){
+    p = Math.min(100, p + Math.floor(Math.random() * 9) + 3);
+    if(el) el.textContent = String(p);
+    if(p >= 100){ clearInterval(bsodTimer); bsodTimer = null; }
+  }, 260);
+  log('SYS // KERNEL PANIC · BSOD');
+}
+
+/* ============================================================
+   help 命令 · 检索索引舞台
+   ============================================================ */
+function buildHelpList(){
+  const list = $('#helpList');
+  const cnt = $('#helpCount');
+  if(cnt) cnt.textContent = DOCS.length;
+  if(!list) return;
+  list.innerHTML = DOCS.map(function(d){
+    return '<div class="help-item" data-id="' + d.id + '" role="button" tabindex="0">' +
+      '<span class="lv">L' + d.level + '</span>' +
+      '<div class="ht"><b>' + d.title + '</b>' +
+      '<small>' + d.type + ' · ' + d.desc + '</small></div></div>';
+  }).join('');
+}
+
+function enterHelp(){
+  buildHelpList();
+  hideAllStages();
+  const app = $('#app');
+  if(app) app.classList.remove('active');
+  const s = $('#sHelp');
+  if(s) s.classList.add('active');
+  if(resBox) resBox.classList.remove('on');
+  log('CMD // HELP · ' + DOCS.length + ' ENTRIES');
+}
+
+function exitHelp(){
+  hideAllStages();
+  if(qInput) qInput.value = '';
+  if(resBox) resBox.classList.remove('on');
+  const app = $('#app');
+  if(app) app.classList.add('active');
+  log('NAV // BACK TO TERMINAL');
+}
+
+/* ============================================================
+   ping → 远程连接请求弹窗
+   ============================================================ */
+var consentPress = 0;
+
+function openConsent(){
+  const m = $('#consentModal');
+  if(!m) return;
+  consentPress = 0;
+  const agree = $('#consentAgree');
+  if(agree) agree.style.flex = '';
+  m.classList.add('on');
+  log('SEC // REMOTE CONNECTION REQUEST');
+}
+
+function closeConsent(){
+  const m = $('#consentModal');
+  if(m) m.classList.remove('on');
+}
+
+function consentDeny(){
+  const btn = $('#consentDeny');
+  const agree = $('#consentAgree');
+
+  // 触感反馈
+  if(btn){
+    btn.classList.remove('tap');
+    void btn.offsetWidth;
+    btn.classList.add('tap');
+    setTimeout(function(){ btn.classList.remove('tap'); }, 200);
+  }
+
+  // 每按一次，同意按钮宽 4px，十次封顶
+  if(consentPress < 10 && agree){
+    consentPress++;
+    agree.style.flex = '0 0 calc(50% - 5px + ' + (consentPress * 4) + 'px)';
+  }
+  log('SEC // REMOTE CONNECTION DECLINED · ' + consentPress);
+}
+
+function consentAccept(){
+  closeConsent();
+  startRm();
+}
+
+/* ---------- 绑定：命令输入 / 索引列表 / 远程连接弹窗 ---------- */
+const cmdInputEl = $('#cmdInput');
+if(cmdInputEl){
+  cmdInputEl.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ e.preventDefault(); submitCommand(cmdInputEl.value); }
+  });
+}
+
+const pingStageEl = $('#sPing');
+if(pingStageEl){
+  pingStageEl.addEventListener('click', function(e){
+    if(e.target.closest('#cmdInputRow')) return;
+    vnAdvance();
+  });
+}
+
+const helpListEl = $('#helpList');
+if(helpListEl){
+  helpListEl.addEventListener('click', function(e){
+    const it = e.target.closest('.help-item');
+    if(!it) return;
+    const id = it.getAttribute('data-id');
+    exitHelp();
+    openDoc(id);
+  });
+}
+
+/* 弹窗标记在脚本之后，用事件委托 */
+document.body.addEventListener('click', function(e){
+  const t = e.target;
+  if(!t) return;
+  if(t.id === 'consentAgree') consentAccept();
+  else if(t.id === 'consentDeny') consentDeny();
+});

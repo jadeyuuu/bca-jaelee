@@ -31,7 +31,7 @@
    <div class="dim" style="font-size:12.5px;letter-spacing:.26em;line-height:2.4">
   NODE // BRIDON-HQ-07<br>
   BUILD v4.2.7 · CLASSIFIED<br>
-  <span class="link-conn" id="connBtn" role="button" tabindex="0">[ 建立安全连接 ]</span><span class="cursor"></span>
+  <span class="link-conn" id="connBtn" role="button" tabindex="0">[ 点击此处建立安全连接 ]</span><span class="cursor"></span>
 </div>
   </div>
 </div>
@@ -99,6 +99,7 @@
     <div class="field"><label>OPERATOR ID</label><span id="uid">————</span></div>
     <div class="field"><label>ACCESS KEY</label><span id="ukey">————</span></div>
     <div class="field"><label>SESSION</label><span class="acc">TEMP / 20:00</span></div>
+    <div class="field"><label>特别提示</label><span class="acc">临时权限仅可单次访问 20 分钟</span></div>
     <div class="btns">
       <button class="btn" onclick="go(5)">登录</button>
     </div>
@@ -138,6 +139,57 @@
       <span class="warn">NO RECOVERY PATH</span>
     </div>
     <p class="e404-tip">请刷新页面重新建立连接</p>
+  </div>
+</div>
+
+<!-- 检索索引（help 命令舞台） -->
+<div class="stage help-stage" id="sHelp">
+  <div class="help-wrap">
+    <div class="help-head">
+      <div class="help-title">检 索 索 引</div>
+      <div class="help-sub">INDEX · 全部可检索词条 · <span id="helpCount">0</span> 条</div>
+      <div class="help-rule"></div>
+    </div>
+    <div class="help-list" id="helpList"></div>
+    <button class="btn help-back" onclick="exitHelp()">← 返回终端</button>
+  </div>
+</div>
+
+<!-- 命令窗口（ping 命令舞台） -->
+<div class="stage cmd-stage" id="sPing">
+  <div class="ping-wrap">
+    <div class="cmdwin cmdwin-stage">
+      <div class="cmdbar"><span>命令提示符</span><span class="cmdbar-x">✕</span></div>
+      <div class="cmdbody" id="cmdBody"></div>
+      <div class="cmdinput" id="cmdInputRow">
+        <span class="cmdps">C:\root\group\admin&gt;</span>
+        <input id="cmdInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"
+               enterkeyhint="go" aria-label="命令输入">
+      </div>
+    </div>
+    <div class="vnbox dlg" id="vnBox">
+      <div class="vn-head"><span class="vn-dot"></span><span>SECURE LINK</span></div>
+      <div class="vn-text" id="vnText"></div>
+      <div class="vn-foot">
+        <span>点击继续</span>
+        <span class="vn-next" id="vnNext">▼</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 蓝屏舞台（模拟） -->
+<div class="stage bsod-stage" id="sBSOD">
+  <div class="bsod-wrap">
+    <div class="bsod-face">:(</div>
+    <div class="bsod-main">你的设备遇到问题，需要重启。我们只收集某些错误信息，然后为你重新启动。</div>
+    <div class="bsod-pct"><b id="bsodPct">0</b>% 完成</div>
+    <div class="bsod-info">
+      <p>如需详细信息，请稍后访问 B.C.A 内部支持节点。</p>
+      <p>停止代码：<b>CRITICAL_PROCESS_DIED</b></p>
+      <p class="bsod-sub">失败的操作：BCA_TERMINAL.sys</p>
+    </div>
+    <div class="bsod-foot">B.C.A SECURE TERMINAL · NODE BRIDON-HQ-07</div>
   </div>
 </div>
 
@@ -541,7 +593,7 @@
         ※ 「带教要求」栏仅适用于 2013 年 2 月前，即本探员未成年期间。<br>
         ※ 标注「迅速治愈」者，处方及休养期由带教方要求压缩。<br>
         ※ 本档案不含心理干预记录。<br>
-        ※ 最近一次完整体检：2019.10（距今 1 个月）
+        ※ 最近一次完整体检：2019.10
       </div>
     </section>
 
@@ -1406,7 +1458,7 @@
         <h4>一 · 关于本档案</h4>
         <p>本档案记录的探员即为JAE LEE。</p>
         <p>B.C.A 的探员信息量极大。因此，各类详细记录一般不会全部摆在终端的开始页面上，避免每位探员档案信息冗余。</p>
-        <p>对却有需求的访问者，B.C.A 于终端顶部加了检索功能，以便用户详细查阅。同时，为面向探员特殊需求，B.C.A 专用操作系统添加了移动端唤起命令窗口功能。</p>
+        <p>对确有需求的访问者，B.C.A 于终端顶部添加了检索功能，以便用户详细查阅。同时，为面向探员特殊需求，B.C.A 专用操作系统添加了检索文件与命令窗口一体化功能。</p>
         <p class="cap">※ 检索栏直连 B.C.A 内部专用操作系统的内核。</p>
       </div>
 
@@ -1421,11 +1473,11 @@
       <div class="dochd">
         <div class="cls">LEVEL 1</div>
         <h3>命 令 窗 口</h3>
-        <div class="dsub">COMMAND LINE · 常识科普 · 欢迎进入科普小课堂XD</div>
+        <div class="dsub">COMMAND LINE · 常识科普 </div>
         <div class="meta">
           <span>类别 <b>常识</b></span>
           <span>来源 <b>技术科</b></span>
-          <span>阅读时长 <b>约 2 分钟</b></span>
+          <span>提示 <b>喜欢您来，欢迎进入彩蛋界面</b></span>
         </div>
       </div>
 
@@ -1459,58 +1511,23 @@
 正在 Ping www.bca.com [10.7.214.9] 具有 32 字节的数据:
 来自 10.7.214.9 的回复: 字节=32 时间=12ms TTL=57
 来自 10.7.214.9 的回复: 字节=32 时间=11ms TTL=57</pre>
-        <p>它只是往对面丢几个小包，看有没有回音。<b>不改文件，不装东西</b>，所以它安全，也最常被拿来"随便试试"。</p>
-
-        <p style="margin-top:16px"><b>2 · rm</b> —— 删除。</p>
-        <pre class="order">rm -f 文件名      # -f：force，不询问，直接删
-rm -rf 目录/      # -r：递归，连里面的东西一起删</pre>
-        <p>Windows 里对应的是 <code>del /f /s /q</code>。参数 <code>-f</code> 的意思只有一个：别问我了，删。</p>
-      </div>
-
-      <div class="docsec">
-        <h4>五 · 关于那条不该打的命令</h4>
-        <p>关于那条 <code>rm -rf /</code> 。</p>
+        <p>它只是跟对面的网站“打招呼”，看有没有回音。<b>不改文件，不装东西</b>，所以它安全，也最常被拿来"随便试试"。</p>
+        
+         <p><b>2 · rm -rf /</b> —— 删除整个操作系统所有目录与文件。</p>
         <div class="dangerbox">
-          <div class="dangerbox-t">⚠ 这不是梗</div>
-          <p><code>rm -rf /</code> 会从根目录开始，递归、强制、不询问地删掉系统里的一切：系统文件、数据库、备份、日志——包括本可以证明是谁删的那份日志。</p>
-          <p>结果通常是：服务器当场报废，数据无法恢复，业务停摆，损失按分钟算。然后人事会找你，法务会找你，可能还有警察。</p>
-          <p class="dangerbox-b">轻则当天收拾东西走人，重则法庭见orz</p>
-          <p>非常感谢你能看到这里口牙，接下来说不定能探索到新彩蛋？</p>
+          <div class="dangerbox-t">⚠ 严重性</div>
+          <p><code>rm -rf /</code> 会从头开始，递归、强制、不询问地删掉系统里的一切：系统文件、数据库、备份、日志等等。</p>
+          <p>结果通常就是一台服务器当场报废，数据无法恢复，只留下一台硬件空壳。</p>
+          <p class="dangerbox-b">现实工作中如果犯了这种错，轻则当天收拾东西走人，重则法庭见orz</p>
         </div>
       </div>
+
+        <p>为探索体验更佳，增添了如此枯燥的页面orz。非常感谢你能看到这里！通过以上了解，接下来说不定能探索到【检索栏】的新领域？</p>
 
       <div class="sigline">
         <span>整理 <b>技术科 · 常识普及组</b></span>
         <span>复核 <b>法务部门</b></span>
         <span>更新 <b>2019.11.20</b></span>
-      </div>
-    </section>
-
-    <!-- ============ 词条：ping ============ -->
-    <section class="view" id="view-doc-ping">
-      <div class="backlink" onclick="backToProfile()">← 返回档案</div>
-      <div class="dochd">
-        <div class="cls">LEVEL 2</div>
-        <h3>PING</h3>
-        <div class="dsub">COMMAND · 网络诊断 · 只读</div>
-        <div class="meta">
-          <span>类型 <b>只读命令</b></span>
-          <span>作用 <b>测试网络连通性</b></span>
-          <span>危险等级 <b>低</b></span>
-        </div>
-      </div>
-
-      <div class="docsec">
-        <h4>一 · 说明</h4>
-        <p>ping 只向外发送探测包，不修改任何文件，是权限最低、最常被使用的诊断命令。</p>
-      </div>
-
-      <div class="cmdwin" id="cmdWin">
-        <div class="cmdbar">
-          <span>命令提示符 · cmd.exe</span>
-          <span class="cmdbar-x">✕</span>
-        </div>
-        <div class="cmdbody" id="cmdBody"></div>
       </div>
     </section>
 
@@ -1555,7 +1572,7 @@ rm -rf 目录/      # -r：递归，连里面的东西一起删</pre>
          所需权限：<span class="warn">LEVEL 5 / DIRECTOR</span><br>
          当前权限：LEVEL 4 / DETECTIVE-CHIEF · 临时</p>
       <p class="esc-sub">UNAUTHORIZED CLEARANCE ATTEMPT · 本次操作已写入审计日志</p>
-      <p class="esc-q">是否申请提权？</p>
+      <p class="esc-q">是否确认申请提权？</p>
       <div class="esc-btns">
         <button class="esc-btn" id="escYes">是</button>
         <button class="esc-btn deny" id="escNo">否</button>
@@ -1587,22 +1604,42 @@ rm -rf 目录/      # -r：递归，连里面的东西一起删</pre>
 
 <!-- JAE LEE · 已知悉提示 -->
 <div id="knownModal" class="tip-modal" role="dialog" aria-modal="true" aria-label="提示">
-  <div class="tip-box">
+  <div class="tip-box dlg">
     <div class="tip-icon">!</div>
     <div class="tip-body">
+      <div class="tip-head">SYSTEM NOTICE</div>
       <p class="tip-line" id="knownTipText">似乎知道了检索栏同时也是特殊的【命令窗口】</p>
-      <p class="tip-q" id="knownTipQ">是否需要科普【命令窗口】？</p>
-      <div class="tip-opts" id="knownTipOpts">
-        <button class="tip-opt" onclick="cmdHelpYes()">是</button>
-        <button class="tip-opt" onclick="cmdHelpNo()">否</button>
+      <div class="tip-foot">
+        <p class="tip-q" id="knownTipQ">是否需要科普【命令窗口】？</p>
+        <div class="tip-opts" id="knownTipOpts">
+          <button class="tip-opt" onclick="cmdHelpYes()">是</button>
+          <button class="tip-opt" onclick="cmdHelpNo()">否</button>
+        </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ping · 远程连接请求 -->
+<div id="consentModal" class="consent-modal" role="dialog" aria-modal="true" aria-labelledby="consentTitle">
+  <div class="consent-box">
+    <div class="consent-icon">⚠</div>
+    <h3 id="consentTitle">远 程 连 接 请 求</h3>
+    <div class="consent-rule"></div>
+    <p>探员 <b>JAE LEE</b> 申请远程连接您的终端。</p>
+    <p>同意后，对方将拥有您终端的所有权限，可执行所有本地操作。请注意您的隐私安全。</p>
+    <p class="consent-q">是否同意？</p>
+    <div class="consent-btns">
+      <button class="consent-btn deny" id="consentDeny">不同意</button>
+      <button class="consent-btn agree" id="consentAgree">同意</button>
     </div>
   </div>
 </div>
 
 <!-- ping · 警告弹窗 -->
 <div id="ratModal" class="rat-modal" role="dialog" aria-modal="true" aria-label="警告">
-  <div class="rat-box">
+  <div class="rat-box dlg">
+    <div class="rat-head">SYSTEM WARNING</div>
     <div class="rat-body" id="ratBody"></div>
   </div>
 </div>
@@ -1630,9 +1667,14 @@ rm -rf 目录/      # -r：递归，连里面的东西一起删</pre>
 <!-- 入组织前经历 · 提权对话 -->
 <div id="preModal" class="pre-modal" role="dialog" aria-modal="true" aria-label="申请提权">
   <div class="pre-flash" id="preFlash"></div>
-  <div class="pre-box">
+  <div class="pre-box dlg">
+    <div class="pre-head"><span class="pre-dot"></span><span>ACCESS ESCALATION</span></div>
     <div class="pre-body" id="preBody"></div>
     <div class="pre-opts" id="preOpts"></div>
+  </div>
+  <div class="purge-box dlg">
+    <div class="purge-head">SYSTEM PURGE</div>
+    <div class="purge-body">已发现入侵人员，<br>执行强制驱逐命令。</div>
   </div>
 </div>
 
