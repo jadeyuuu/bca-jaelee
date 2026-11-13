@@ -1203,3 +1203,125 @@ hr.sep{border:0; height:1px; background:var(--line); margin:22px 0 26px}
   .bsod-info{font-size:12px}
   .bsod-foot{font-size:11px; padding-top:36px}
 }
+
+/* ================= P12：whoami / 雪花故障 ================= */
+
+/* exit 成功后的黑屏 */
+#sWhoami{transition:background .6s ease}
+#sWhoami.black{background:#000}
+#sWhoami .cmdwin{transition:opacity .35s ease}
+#sWhoami.black .cmdwin{opacity:0}
+
+/* 雪花故障 */
+.glitch{
+  position:fixed; inset:0; z-index:380; pointer-events:none;
+  display:none; overflow:hidden; background:transparent;
+}
+.glitch.on{display:block}
+.glitch-patch{
+  position:absolute; opacity:0;
+  background-image:var(--noise); background-size:120px 90px; background-repeat:repeat;
+  filter:contrast(1.7) brightness(1.15);
+  mix-blend-mode:screen;
+  animation:patchFlicker .16s steps(1) infinite;
+}
+@keyframes patchFlicker{
+  0%{opacity:0}
+  35%{opacity:.95}
+  55%{opacity:.15}
+  75%{opacity:.8}
+  100%{opacity:.35}
+}
+.glitch-scan{
+  position:absolute; inset:-20% 0; opacity:0;
+  background:repeating-linear-gradient(0deg, rgba(0,0,0,.45) 0 1px, transparent 1px 3px);
+  animation:scanRoll 1.4s linear infinite;
+  transition:opacity .5s linear;
+}
+.glitch-full{
+  position:absolute; inset:0; opacity:0;
+  background-image:var(--noise); background-size:150px 112px; background-repeat:repeat;
+  filter:contrast(1.3) brightness(1.05);
+  transition:opacity .55s linear;
+  animation:glitchShift .08s steps(1) infinite;
+}
+.glitch.on.full .glitch-full{opacity:1}
+.glitch.on.full .glitch-scan{opacity:.85}
+.glitch.on.full .glitch-patch{display:none}
+@keyframes glitchShift{
+  0%{background-position:0 0}
+  20%{background-position:-47px 19px}
+  40%{background-position:31px -13px}
+  60%{background-position:-17px -37px}
+  80%{background-position:53px 7px}
+  100%{background-position:0 0}
+}
+@keyframes scanRoll{from{transform:translateY(0)}to{transform:translateY(12px)}}
+
+#sWhoami.shake{animation:screenShake .11s steps(2) infinite}
+@keyframes screenShake{
+  0%{transform:translate(0,0)}
+  25%{transform:translate(-2px,1px)}
+  50%{transform:translate(1px,-2px)}
+  75%{transform:translate(2px,2px)}
+  100%{transform:translate(0,0)}
+}
+
+@media (max-width:640px){
+  .glitch-patch{filter:contrast(1.6) brightness(1.1)}
+}
+
+/* ================= P13：whoami 顶部倒计时提示条 ================= */
+.toast{
+  position:fixed; top:0; left:50%; z-index:345;
+  width:min(430px, calc(100vw - 28px));
+  display:flex; align-items:center; gap:14px;
+  padding:15px 20px 19px;
+  background:rgba(9,15,18,.97);
+  border:1px solid rgba(79,224,192,.38);
+  border-top:0;
+  box-shadow:0 22px 54px rgba(0,0,0,.66), inset 0 1px 0 rgba(79,224,192,.22);
+  transform:translate(-50%, -130%);
+  opacity:0; visibility:hidden; pointer-events:none;
+  transition:transform .5s cubic-bezier(.16,1,.3,1), opacity .3s ease, visibility .3s, background .3s, border-color .3s;
+}
+.toast.on{transform:translate(-50%, 0); opacity:1; visibility:visible}
+
+.toast-icon{position:relative; width:38px; height:38px; flex:0 0 auto}
+.toast-ring{position:absolute; inset:0; transform:rotate(-90deg)}
+.toast-ring circle{fill:none; stroke-width:2}
+.ring-bg{stroke:rgba(255,255,255,.1)}
+.ring-fg{
+  stroke:var(--acc); stroke-linecap:round;
+  stroke-dasharray:97.4; stroke-dashoffset:0;
+  transition:stroke-dashoffset .1s linear, stroke .3s;
+  filter:drop-shadow(0 0 4px rgba(79,224,192,.55));
+}
+.toast-num{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-size:14px; letter-spacing:0; color:var(--acc); transition:color .3s;
+}
+.toast-body{flex:1; min-width:0}
+.toast-title{font-size:11px; letter-spacing:.2em; color:var(--txt2); margin-bottom:5px}
+.toast-msg{font-size:12px; line-height:1.75; letter-spacing:.06em; color:var(--dim)}
+.toast-msg b{color:var(--txt2); font-weight:400; letter-spacing:.1em}
+
+.toast-bar{position:absolute; left:0; right:0; bottom:0; height:2px; background:rgba(255,255,255,.07)}
+.toast-bar i{
+  display:block; height:100%; width:100%; background:var(--acc);
+  box-shadow:0 0 10px var(--acc); transition:width .1s linear, background .3s;
+}
+
+/* 最后 2 秒转红 */
+.toast.urgent{border-color:rgba(255,90,106,.6); background:rgba(20,6,8,.98)}
+.toast.urgent .ring-fg{stroke:var(--warn); filter:drop-shadow(0 0 5px rgba(255,90,106,.6))}
+.toast.urgent .toast-num{color:var(--warn)}
+.toast.urgent .toast-title{color:rgba(255,90,106,.85)}
+.toast.urgent .toast-bar i{background:var(--warn); box-shadow:0 0 12px var(--warn)}
+.toast.urgent .toast-num{animation:pulse .9s infinite}
+
+@media (max-width:640px){
+  .toast{width:calc(100vw - 20px); padding:13px 15px 17px; gap:11px}
+  .toast-title{font-size:10px}
+  .toast-msg{font-size:11.5px}
+}

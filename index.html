@@ -193,6 +193,39 @@
   </div>
 </div>
 
+<!-- 命令窗口（whoami 命令舞台） -->
+<div class="stage cmd-stage" id="sWhoami">
+  <div class="ping-wrap">
+    <div class="cmdwin cmdwin-stage">
+      <div class="cmdbar"><span>命令提示符</span><span class="cmdbar-x">✕</span></div>
+      <div class="cmdbody" id="wmBody"></div>
+      <div class="cmdinput hide" id="wmRow">
+        <span class="cmdps">C:\root\group\admin&gt;</span>
+        <input id="wmInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"
+               enterkeyhint="go" aria-label="命令输入">
+      </div>
+    </div>
+    <div class="vnbox dlg" id="wmBox">
+      <div class="vn-head"><span class="vn-dot"></span><span>SECURE LINK</span></div>
+      <div class="vn-text" id="wmText"></div>
+      <div class="vn-foot">
+        <span id="wmHint">点击继续</span>
+        <span class="vn-next" id="wmTimer"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 雪花故障浮层 -->
+<div class="glitch" id="glitch" aria-hidden="true">
+  <div class="glitch-patch" id="gp1"></div>
+  <div class="glitch-patch" id="gp2"></div>
+  <div class="glitch-patch" id="gp3"></div>
+  <div class="glitch-patch" id="gp4"></div>
+  <div class="glitch-scan"></div>
+  <div class="glitch-full"></div>
+</div>
+
 <!-- 主界面 -->
 <div id="app">
   <aside class="side">
@@ -1618,6 +1651,30 @@
       </div>
     </div>
   </div>
+</div>
+
+<!-- whoami · 警告弹窗 -->
+<div id="wmWarn" class="rat-modal" role="dialog" aria-modal="true" aria-label="警告">
+  <div class="rat-box dlg">
+    <div class="rat-head">IDENTITY CHECK FAILED</div>
+    <div class="rat-body" id="wmWarnBody"></div>
+  </div>
+</div>
+
+<!-- whoami · 顶部倒计时提示 -->
+<div id="wmToast" class="toast" role="status" aria-live="assertive">
+  <div class="toast-icon">
+    <svg class="toast-ring" viewBox="0 0 36 36" aria-hidden="true">
+      <circle class="ring-bg" cx="18" cy="18" r="15.5"></circle>
+      <circle class="ring-fg" id="toastRing" cx="18" cy="18" r="15.5"></circle>
+    </svg>
+    <span class="toast-num" id="toastNum">5</span>
+  </div>
+  <div class="toast-body">
+    <div class="toast-title">安全提示 · 需要确认</div>
+    <div class="toast-msg">请在倒计时结束前，于命令窗口输入 <b>exit</b> 退出。</div>
+  </div>
+  <div class="toast-bar"><i id="toastBar"></i></div>
 </div>
 
 <!-- ping · 远程连接请求 -->

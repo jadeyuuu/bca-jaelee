@@ -398,7 +398,7 @@ function renderResults(list, opts){
 /* ---------- 检索 ---------- */
 /* help / ping 不是词条，是命令：输入后需按 Enter 才执行 */
 function asCommand(q){
-  if(q === 'help' || q === 'ping') return q;
+  if(q === 'help' || q === 'ping' || q === 'whoami') return q;
   return '';
 }
 
@@ -427,6 +427,7 @@ function doSearch(){
 function runCommand(name){
   if(name === 'help') enterHelp();
   else if(name === 'ping') enterPing();
+  else if(name === 'whoami') enterWhoami();
 }
 
 if(qInput){
@@ -804,7 +805,7 @@ function failAuth(){
   modal.classList.add('on');
   log('SEC // SECURITY QUESTION FAILED');
 
-  typeLine(l1, '答错了，这里可不欢迎不认识的小老鼠呢ᯇᴗᯇ', 70, function(){
+  typeLine(l1, '答错咯，我可不欢迎不认识的小老鼠ᯇᴗᯇ', 70, function(){
     l1.classList.remove('typing');
     authTimers.push(setTimeout(function(){
       l2.classList.add('typing');
@@ -861,7 +862,7 @@ const PRE_TREE = {
     ]
   },
   q1: {
-    text: '看够了吗，这么好奇我的经历吗ᯇᴗᯇ',
+    text: '看够了？这么好奇我的经历吗ᯇᴗᯇ',
     opts: [
       { label: '抱歉，我没有恶意', to: 'soft' },
       { label: '有些好奇', to: 'curious' }
@@ -891,7 +892,7 @@ const PRE_TREE = {
     end: 'CLOSE'
   },
   sure: {
-    text: '真是执着呢，真的确定？',
+    text: '真是执着呢，确定？',
     opts: [
       { label: '算了', to: 'giveup' },
       { label: '确定', to: 'final' }
@@ -900,9 +901,9 @@ const PRE_TREE = {
   final: {
     cls: 'danger',
     beats: [
-      { text: '你知道吗，B.C.A有一个全局共识，不该问的不问。', cls: 'warn', pause: 2000 },
-      { text: '看来你不会是 B.C.A 的人。抓到你了，小老鼠。', cls: 'warn', pause: 2000 },
-      { text: '已经给过你很多次机会了，这次，该有惩罚了。', cls: 'warn blink', pause: 2000 }
+      { text: '你知道吗，B.C.A全局共识，不该问的不问。', cls: 'warn', pause: 2000 },
+      { text: '看来你不是内部人员。抓到你了，小老鼠。', cls: 'warn', pause: 2000 },
+      { text: '已经给过你很多次机会了。该有惩罚了。', cls: 'warn blink', pause: 2000 }
     ],
     end: 'KICK'
   }
@@ -1140,15 +1141,18 @@ function stopPing(){
 }
 
 /* 往黑窗里追加一行 */
-function cmdAppend(text, cls){
-  const body = $('#cmdBody');
-  if(!body) return null;
+function cmdAppendTo(host, text, cls){
+  if(!host) return null;
   const el = document.createElement('div');
   el.className = 'cmd-line' + (cls ? ' ' + cls : '');
   el.textContent = text;
-  body.appendChild(el);
-  body.scrollTop = body.scrollHeight;
+  host.appendChild(el);
+  host.scrollTop = host.scrollHeight;
   return el;
+}
+
+function cmdAppend(text, cls){
+  return cmdAppendTo($('#cmdBody'), text, cls);
 }
 
 /* ---------- 进入命令窗口舞台 ---------- */
@@ -1419,6 +1423,8 @@ var bsodTimer = null;
 function showBSOD(){
   clearPingTimers();
   clearRatTimers();
+  clearWmTimers();
+  stopGlitch();
   stopSessionTimer();
   hideAllStages();
   const app = $('#app');
@@ -1553,3 +1559,336 @@ document.body.addEventListener('click', function(e){
   if(t.id === 'consentAgree') consentAccept();
   else if(t.id === 'consentDeny') consentDeny();
 });
+
+/* ============================================================
+   whoami 命令（独立舞台，自动播放 → 警告 → 5 秒 exit 倒计时）
+   ============================================================ */
+var wmTimers = [];
+var wmQueue = [];
+var wmIdx = 0;
+var wmState = 'idle';
+var wmCountdown = null;
+var glitchTimers = [];
+var glitchNoiseTimer = null;
+var noiseFrames = [];
+
+var WM_SCRIPT = [
+  { d: 360, t: 'C:\\root\\group\\admin> whoami', type: true },
+  { d: 460, t: 'bca\\jae' },
+  { d: 260, t: '' },
+  { d: 300, t: '组别:      Users' },
+  { d: 240, t: '会话:      console' },
+  { d: 240, t: '权限:      标准用户' },
+  { d: 620, t: '' },
+  { d: 480, t: '[ 身份校验 ] 检测到当前网络代理超过三层', c: 'err' },
+  { d: 520, t: '[ 身份校验 ] 您并非 JAE LEE 探员本人', c: 'err' },
+  { d: 640, t: '[ 身份校验 ] 已通知总部：存在外部人员入侵', c: 'err' },
+  { d: 760, t: '' }
+];
+
+var WM_WARN = [
+  { t: '人还是要懂知难而退', p: 1600 },
+  { t: '我来请你出去可就不一样了。', p: 1300, blink: true }
+];
+
+function clearWmTimers(){
+  for(var i = 0; i < wmTimers.length; i++){
+    clearTimeout(wmTimers[i]);
+    clearInterval(wmTimers[i]);
+  }
+  wmTimers = [];
+  if(wmCountdown){ clearInterval(wmCountdown); wmCountdown = null; }
+}
+
+function enterWhoami(){
+  hideAllStages();
+  const app = $('#app');
+  if(app) app.classList.remove('active');
+  const s = $('#sWhoami');
+  if(s){ s.classList.remove('black', 'shake'); s.classList.add('active'); }
+  if(resBox) resBox.classList.remove('on');
+  startWhoami();
+}
+
+function startWhoami(){
+  clearWmTimers();
+  closeWmWarn();
+  stopGlitch();
+  hideWmToast();
+  wmState = 'idle';
+
+  const body = $('#wmBody');
+  if(body) body.innerHTML = '';
+  const box = $('#wmBox');
+  if(box) box.classList.remove('on');
+  const row = $('#wmRow');
+  if(row) row.classList.add('hide');
+  const inp = $('#wmInput');
+  if(inp){ inp.value = ''; inp.disabled = false; }
+  const timer = $('#wmTimer');
+  if(timer) timer.textContent = '';
+  const hint = $('#wmHint');
+  if(hint) hint.textContent = '';
+  const s = $('#sWhoami');
+  if(s) s.classList.remove('black', 'shake');
+
+  wmQueue = WM_SCRIPT;
+  wmIdx = 0;
+  wmTimers.push(setTimeout(wmStep, 380));
+  log('CMD // WHOAMI');
+}
+
+function wmStep(){
+  if(wmIdx >= wmQueue.length){ openWmWarn(); return; }
+  const host = $('#wmBody');
+  if(!host) return;
+  const s = wmQueue[wmIdx++];
+  const line = cmdAppendTo(host, s.t, s.c);
+  const next = function(){ wmTimers.push(setTimeout(wmStep, s.d)); };
+  if(s.type && line) typeCmd(line, s.t, 30, wmTimers, next);
+  else next();
+}
+
+/* ---- 警告弹窗 ---- */
+function openWmWarn(){
+  const m = $('#wmWarn');
+  const b = $('#wmWarnBody');
+  if(!m || !b) return;
+  b.innerHTML = '';
+  m.classList.add('on');
+  log('SEC // IDENTITY CHECK FAILED');
+  wmPlayWarn(0);
+}
+
+function wmPlayWarn(i){
+  const b = $('#wmWarnBody');
+  if(!b || i >= WM_WARN.length) return;
+  const s = WM_WARN[i];
+  const p = document.createElement('p');
+  p.className = 'rat-line' + (s.blink ? ' blink' : '');
+  b.appendChild(p);
+  p.classList.add('typ');
+  typeCmd(p, s.t, 64, wmTimers, function(){
+    p.classList.remove('typ');
+    wmTimers.push(setTimeout(function(){
+      if(i + 1 >= WM_WARN.length){ finishWmWarn(); return; }
+      wmPlayWarn(i + 1);
+    }, s.p));
+  });
+}
+
+function finishWmWarn(){
+  wmTimers.push(setTimeout(function(){
+    closeWmWarn();
+    askExit();
+  }, 1000));
+}
+
+function closeWmWarn(){
+  const m = $('#wmWarn');
+  if(m) m.classList.remove('on');
+  const b = $('#wmWarnBody');
+  if(b) b.innerHTML = '';
+}
+
+/* ---- 倒计时与 exit ---- */
+function askExit(){
+  wmState = 'await-exit';
+  const box = $('#wmBox');
+  if(box) box.classList.add('on');
+  const tx = $('#wmText');
+  if(tx){ tx.textContent = ''; typeCmd(tx, '立刻输入 exit 退出。', 48, wmTimers); }
+  const hint = $('#wmHint');
+  if(hint) hint.textContent = '注意顶部倒计时';
+  const row = $('#wmRow');
+  if(row) row.classList.remove('hide');
+  const inp = $('#wmInput');
+  if(inp){ inp.value = ''; inp.disabled = false; setTimeout(function(){ inp.focus(); }, 70); }
+  log('CMD // AWAITING EXIT');
+  startWmCountdown(5);
+}
+
+var TOAST_CIRC = 97.4;
+
+function hideWmToast(){
+  const t = $('#wmToast');
+  if(t) t.classList.remove('on', 'urgent');
+}
+
+function startWmCountdown(sec){
+  const total = sec * 1000;
+  const endAt = Date.now() + total;
+  const num = $('#toastNum');
+  const bar = $('#toastBar');
+  const ring = $('#toastRing');
+  const toast = $('#wmToast');
+  const timer = $('#wmTimer');
+  if(timer) timer.textContent = '';
+
+  if(toast){ toast.classList.remove('urgent'); toast.classList.add('on'); }
+  if(ring) ring.style.strokeDashoffset = '0';
+  if(bar) bar.style.width = '100%';
+  if(num) num.textContent = String(sec);
+
+  if(wmCountdown) clearInterval(wmCountdown);
+  wmCountdown = setInterval(function(){
+    const left = Math.max(0, endAt - Date.now());
+    const ratio = left / total;
+    if(num) num.textContent = String(Math.max(0, Math.ceil(left / 1000)));
+    if(bar) bar.style.width = (ratio * 100).toFixed(1) + '%';
+    if(ring) ring.style.strokeDashoffset = (TOAST_CIRC * (1 - ratio)).toFixed(2);
+    if(toast){
+      if(left <= 2000) toast.classList.add('urgent');
+      else toast.classList.remove('urgent');
+    }
+    if(left <= 0){
+      clearInterval(wmCountdown);
+      wmCountdown = null;
+      hideWmToast();
+      startGlitch();
+    }
+  }, 100);
+}
+
+function wmSubmit(){
+  const inp = $('#wmInput');
+  if(!inp) return;
+  const raw = inp.value.trim();
+  if(!raw) return;
+  const host = $('#wmBody');
+  cmdAppendTo(host, 'C:\\root\\group\\admin> ' + raw);
+  inp.value = '';
+
+  if(wmState === 'await-exit' && raw.toLowerCase() === 'exit'){
+    wmExit();
+    return;
+  }
+  cmdAppendTo(host, "'" + raw + "' 不是有效的退出方式。请立刻输入 exit。", 'err');
+  inp.focus();
+}
+
+/* exit 成功：黑屏 → 对话框 → 回启动页 */
+function wmExit(){
+  wmState = 'exit';
+  if(wmCountdown){ clearInterval(wmCountdown); wmCountdown = null; }
+  hideWmToast();
+  const timer = $('#wmTimer');
+  if(timer) timer.textContent = '';
+  const row = $('#wmRow');
+  if(row) row.classList.add('hide');
+  const s = $('#sWhoami');
+  if(s) s.classList.add('black');
+  const box = $('#wmBox');
+  if(box) box.classList.remove('on');
+  log('CMD // EXIT ACCEPTED');
+
+  wmTimers.push(setTimeout(function(){
+    const b = $('#wmBox');
+    if(b) b.classList.add('on');
+    const tx = $('#wmText');
+    if(tx){ tx.textContent = ''; typeCmd(tx, '似乎没有被查到了。', 55, wmTimers); }
+    const hint = $('#wmHint');
+    if(hint) hint.textContent = '';
+  }, 900));
+
+  wmTimers.push(setTimeout(function(){ exitWhoami(); }, 3600));
+}
+
+function exitWhoami(){
+  clearWmTimers();
+  closeWmWarn();
+  stopGlitch();
+  hideWmToast();
+  stopSessionTimer();
+  const app = $('#app');
+  if(app) app.classList.remove('active');
+  const s = $('#sWhoami');
+  if(s) s.classList.remove('active', 'black', 'shake');
+  resetStages();
+  resetWorkspace();
+  go(0);
+  log('SYS // EXIT · SESSION CLOSED');
+}
+
+/* ============================================================
+   雪花故障 → 蓝屏
+   ============================================================ */
+function makeNoise(){
+  try{
+    const c = document.createElement('canvas');
+    c.width = 120; c.height = 90;
+    const ctx = c.getContext('2d');
+    if(!ctx) return '';
+    const img = ctx.createImageData(120, 90);
+    for(var i = 0; i < img.data.length; i += 4){
+      const v = (Math.random() * 255) | 0;
+      img.data[i] = v; img.data[i + 1] = v; img.data[i + 2] = v; img.data[i + 3] = 255;
+    }
+    ctx.putImageData(img, 0, 0);
+    return c.toDataURL();
+  }catch(err){
+    return '';
+  }
+}
+
+function startGlitch(){
+  const g = $('#glitch');
+  if(!g) return;
+  wmState = 'timeout';          /* 超时后不再接受 exit */
+  hideWmToast();
+  if(!noiseFrames.length){
+    for(var k = 0; k < 3; k++){
+      const u = makeNoise();
+      if(u) noiseFrames.push(u);
+    }
+  }
+  if(noiseFrames.length) g.style.setProperty('--noise', 'url(' + noiseFrames[0] + ')');
+
+  [['#gp1'], ['#gp2'], ['#gp3'], ['#gp4']].forEach(function(item, i){
+    const el = $(item[0]);
+    if(!el) return;
+    el.style.width = (110 + Math.random() * 260) + 'px';
+    el.style.height = (50 + Math.random() * 150) + 'px';
+    el.style.left = (Math.random() * 78) + 'vw';
+    el.style.top = (Math.random() * 78) + 'vh';
+    el.style.animationDelay = (i * 0.07) + 's';
+  });
+
+  stopGlitch();
+  g.classList.add('on');
+  log('SYS // SIGNAL LOST');
+
+  /* 噪点换帧（真·雪花） */
+  if(noiseFrames.length > 1){
+    glitchNoiseTimer = setInterval(function(){
+      const u = noiseFrames[Math.floor(Math.random() * noiseFrames.length)];
+      g.style.setProperty('--noise', 'url(' + u + ')');
+    }, 90);
+  }
+
+  glitchTimers.push(setTimeout(function(){
+    g.classList.add('full');
+    const s = $('#sWhoami');
+    if(s) s.classList.add('shake');
+  }, 1200));
+
+  glitchTimers.push(setTimeout(function(){ showBSOD(); }, 3800));
+}
+
+function stopGlitch(){
+  for(var i = 0; i < glitchTimers.length; i++) clearTimeout(glitchTimers[i]);
+  glitchTimers = [];
+  if(glitchNoiseTimer){ clearInterval(glitchNoiseTimer); glitchNoiseTimer = null; }
+  const g = $('#glitch');
+  if(g) g.classList.remove('on', 'full');
+  const s = $('#sWhoami');
+  if(s) s.classList.remove('shake');
+}
+
+/* 输入绑定 */
+const wmInputEl = $('#wmInput');
+if(wmInputEl){
+  wmInputEl.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ e.preventDefault(); wmSubmit(); }
+  });
+}
